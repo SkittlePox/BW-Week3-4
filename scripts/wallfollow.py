@@ -39,7 +39,7 @@ class ObjectDetectorNode:
         self.vision = rospy.Subscriber("/scan", LaserScan, self.drive_control)
         self.joystick = rospy.Subscriber("/vesc/joy", Joy, self.handle_buttons)
 
-        rospy.init_node("object_detector_node")
+        rospy.init_node("slam")
         self.header = std_msgs.msg.Header()
         self.header.stamp = rospy.Time.now()
         self.STOP = AckermannDriveStamped(self.header, AckermannDrive(steering_angle=0.0, speed=0.0))
