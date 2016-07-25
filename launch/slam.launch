@@ -1,0 +1,3 @@
+<launch>
+    <node pkg = "BW-Week3-4" name = "slam" type="~/BW-Week3-4/scripts/slam.py"/>
+</launch>
