@@ -49,6 +49,7 @@ class BugNav:
         msg = AckermannDriveStamped()
         msg.drive.speed = speed
         msg.drive.steering_angle = angle
+        print(angle)
         self.drive_pub.publish(msg)
 
 if __name__ == "__main__":
