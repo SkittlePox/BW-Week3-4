@@ -23,7 +23,7 @@ class Fieldnav:
 
         self.drivepub.publish(ackmsg)
 
-    def coordconvert(self, angle, index):
+    def coordconvert(self, radius, index):
 	squrad=radius*radius
 	angle=math.radians((index-180)/6)
 	return (math.cos(angle)/squrad, math.sin(angle)/squrad)
@@ -33,12 +33,12 @@ class Fieldnav:
 	vx=0.0;
 	vy=0.0;
 
-	for i in range(180:900):
-	    vx+=coordconvert(scan.ranges[i])
-	    vy+=coordconvert(scan.ranges[i])
+	for i in range(180,900):
+	    vx+=self.coordconvert(scan.ranges[i], i)[0]
+	    vy+=self.coordconvert(scan.ranges[i], i)[1]
 
-	self.drive(vx, vy)
-	print vx + "," + vy
+	self.drive(vx*.001, vy*.0006)
+	print str(vx*.001) + "," + str(vy*.0006)
 	   
 
 if __name__ == '__main__':
