@@ -55,7 +55,7 @@ class ObjectDetectorNode:
         if b_pressed == 1:
             self.stopped = True
         if third_but_pressed == 1:
-	    self.is_running = True	
+	    self.is_running = True
 
     def drive_control(self, msg):
         if self.is_running:
