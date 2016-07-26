@@ -10,7 +10,7 @@ class ObjectDetectorNode:
     def __init__(self):
         self.drive_pub = rospy.Publisher("/vesc/ackermann_cmd_mux/input/navigation", AckermannDriveStamped)
         self.vision = rospy.Subscriber("/scan", LaserScan, self.drive_control)
-        self.right = True 
+        self.right = True
         self.target = 0.5
         self.kp = 0.5
         rospy.init_node("slam")
@@ -28,7 +28,7 @@ class ObjectDetectorNode:
         angle = (error * self.kp * flipConstant)
 
         drive_command = AckermannDriveStamped()
-        drive_command.drive.speed = 2
+        drive_command.drive.speed = 1.0
         drive_command.drive.steering_angle = angle
         self.drive_pub.publish(drive_command)
 
