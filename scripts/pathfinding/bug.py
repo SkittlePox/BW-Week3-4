@@ -22,7 +22,15 @@ class BugNav:
         self.bound_45 = 180
 
     def scan_received(self, msg):
-        self.drive(self.calculateAngle(msg), self.speed)
+        self.drive(self.calculateAngle(msg), self.calculateSpeed(msg))
+
+    def calculateSpeed(self, msg):
+        if(self.getMin(self.left, msg) < self.side_thres and
+           self.getMin(self.right, msg) < self.side_thres and
+           self.getMin(self.center, msg) < self.fore_thres):
+            print("ey")
+            return 0.0
+        else return self.speed
 
     def calculateAngle(self, msg):
         if(self.getMin(self.center, msg) < self.fore_thres):
@@ -30,9 +38,6 @@ class BugNav:
                 return 0.5
             elif(self.getMin(self.right, msg) > self.side_thres):
                 return -0.5
-            else:
-                print("noo")
-                return 0.0
         else:
             return 0.0
 
