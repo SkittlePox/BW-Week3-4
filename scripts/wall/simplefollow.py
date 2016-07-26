@@ -27,7 +27,7 @@ class ObjectDetectorNode:
         error = min(ranges) - self.target
         angle = (error * self.kp * flipConstant)
 
-        drive_command = AckermannDriveStamped(self.header, AckermannDrive(steering_angle=angle, speed=1.0))
+        drive_command = AckermannDriveStamped(std_msgs.msg.Header(), AckermannDrive(steering_angle=angle, speed=1.0))
         self.drive_pub.publish(drive_command)
 
 if __name__ == "__main__":
