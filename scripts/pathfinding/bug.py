@@ -17,8 +17,8 @@ class BugNav:
         self.side_thres = 0.3
 
         self.center = 540
-        self.left = 180
-        self.right = 900
+        self.left = 720
+        self.right = 360
         self.bound_45 = 180
 
     def scan_received(self, msg):
