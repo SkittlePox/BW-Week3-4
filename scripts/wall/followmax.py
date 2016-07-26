@@ -30,7 +30,7 @@ class WallFollower:
         return angle
 
     def getDistance(self, msg):
-        return math.min(msg.ranges[880:910])
+        return min(msg.ranges[880:910])
 
     def drive(self, angle, speed):
         msg = AckermannDriveStamped()
