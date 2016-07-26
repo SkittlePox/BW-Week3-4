@@ -13,6 +13,7 @@ class ObjectDetectorNode:
         self.right = True
         self.target = 0.5
         self.kp = 0.5
+        self.posAngle = 0
         rospy.init_node("slam")
 
     def drive_control(self, msg):
