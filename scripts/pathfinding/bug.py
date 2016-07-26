@@ -46,10 +46,11 @@ class BugNav:
         return min(msg.ranges[bound-self.bound_45:bound+self.bound_45])
 
     def drive(self, angle, speed):
+        if(angle is None):
+            print("wtf")
         msg = AckermannDriveStamped()
         msg.drive.speed = speed
         msg.drive.steering_angle = angle
-        print(angle)
         self.drive_pub.publish(msg)
 
 if __name__ == "__main__":
