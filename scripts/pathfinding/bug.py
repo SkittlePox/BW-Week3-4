@@ -12,9 +12,9 @@ class BugNav:
         self.drive_pub = rospy.Publisher(
             "/vesc/ackermann_cmd_mux/input/navigation", AckermannDriveStamped)
         rospy.Subscriber("/scan", LaserScan, self.scan_received)
-        self.speed = 1.0
+        self.speed = 0.5
         self.fore_thres = 0.5
-        self.side_thres = 0.3
+        self.side_thres = 0.2
 
         self.center = 540
         self.left = 720
@@ -28,7 +28,6 @@ class BugNav:
         if(self.getMin(self.left, msg) < self.side_thres and
            self.getMin(self.right, msg) < self.side_thres and
            self.getMin(self.center, msg) < self.fore_thres):
-            print("ey")
             return 0.0
         else:
             return self.speed
