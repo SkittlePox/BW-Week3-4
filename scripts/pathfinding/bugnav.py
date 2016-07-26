@@ -8,7 +8,7 @@ import numpy
 from ackermann_msgs.msg import AckermannDriveStamped # steering messages
 from sensor_msgs.msg import LaserScan, Joy # joystick and laser scanner msgs; Joy may be unnecessary
 
-class bugnav():
+class bugnav:
 
     def __init__(self):
 	
