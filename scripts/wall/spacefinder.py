@@ -24,9 +24,10 @@ class spacefinder:
         self.drive_pub.publish(drive_command)
 
     def findLongest(self, ranges):
-        rangenum = 39
+        bound = 200
+        rangenum = 120
         slices = []
-        for i in range(180, 901):
+        for i in range(bound, 1081-bound):
             summ = 0
             for x in range(0, (rangenum+1)/2):
                 if x != 0:

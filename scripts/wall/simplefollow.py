@@ -8,13 +8,13 @@ from std_msgs.msg import *
 
 class ObjectDetectorNode:
     def __init__(self):
+        rospy.init_node("slam")
         self.drive_pub = rospy.Publisher("/vesc/ackermann_cmd_mux/input/navigation", AckermannDriveStamped)
         self.vision = rospy.Subscriber("/scan", LaserScan, self.drive_control)
         self.right = True
         self.target = 0.5
-        self.kp = 0.5
+        self.kp = 1
         self.posAngle = 0
-        rospy.init_node("slam")
 
     def drive_control(self, msg):
         #Main function
