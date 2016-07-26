@@ -15,6 +15,8 @@ class WallFollower:
         self.distance_desired = 0.5
         self.Kp = -0.6
         self.Kd = -0.7
+        self.left = 880
+        self.right = 170
         self.distance_last = 0.5
 
     def scan_received(self, msg):
@@ -31,7 +33,8 @@ class WallFollower:
         return angle
 
     def getDistance(self, msg):
-        return min(msg.ranges[880:910])
+        c = self.left
+        return min(msg.ranges[c:c+30])
 
     def drive(self, angle, speed):
         msg = AckermannDriveStamped()
