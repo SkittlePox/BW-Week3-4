@@ -30,7 +30,8 @@ class BugNav:
            self.getMin(self.center, msg) < self.fore_thres):
             print("ey")
             return 0.0
-        else return self.speed
+        else:
+            return self.speed
 
     def calculateAngle(self, msg):
         if(self.getMin(self.center, msg) < self.fore_thres):
