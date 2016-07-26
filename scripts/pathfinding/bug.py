@@ -12,7 +12,7 @@ class BugNav:
         self.drive_pub = rospy.Publisher(
             "/vesc/ackermann_cmd_mux/input/navigation", AckermannDriveStamped)
         rospy.Subscriber("/scan", LaserScan, self.scan_received)
-        self.speed = 1
+        self.speed = 1.0
         self.fore_thres = 0.5
         self.side_thres = 0.3
 
