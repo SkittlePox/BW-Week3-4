@@ -12,10 +12,10 @@ class WallFollower:
         self.drive_pub = rospy.Publisher(
             "/vesc/ackermann_cmd_mux/input/navigation", AckermannDriveStamped)
         rospy.Subscriber("/scan", LaserScan, self.scan_received)
-        self.distance_desired = 1
-        self.Kp = 0.6
-        self.Kd = 0.7
-        self.distance_last = 1
+        self.distance_desired = 0.5
+        self.Kp = -0.6
+        self.Kd = -0.7
+        self.distance_last = 0.5
 
     def scan_received(self, msg):
         self.drive(self.calculateAngle(msg), 1)
