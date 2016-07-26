@@ -8,6 +8,7 @@ from sensor_msgs.msg import LaserScan
 
 class WallFollower:
     def __init__(self):
+        rospy.init_node("wall_follow")
         self.drive_pub = rospy.Publisher(
             "/vesc/ackermann_cmd_mux/input/navigation", AckermannDriveStamped)
         rospy.Subscriber("/scan", LaserScan, self.scan_received)
@@ -40,5 +41,4 @@ class WallFollower:
 
 if __name__ == "__main__":
     node = WallFollower()
-    rospy.init_node("wall_follow")
     rospy.spin()
