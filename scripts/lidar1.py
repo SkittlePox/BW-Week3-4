@@ -90,7 +90,7 @@ class WallE():
         rospy.Subscriber('scan', LaserScan, self.callback)
         rospy.Subscriber('vesc/joy', Joy, self.callback2)
 
-	rospy.Subscriber("color_found", Bool, self.starter)#N
+#	rospy.Subscriber("color_found", Bool, self.starter)#N
         
         # set control parameters
         speed = 2.0 # constant travel speed in meters/second
