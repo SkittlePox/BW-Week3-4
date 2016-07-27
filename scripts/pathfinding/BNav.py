@@ -33,7 +33,7 @@ class BNav:
         for i in range(0, len(ranges)):
             cX += (0.1 / ranges[i]**2) * np.sin(np.deg2rad((i - 540) / 4))
             cY += -1 * (0.1 / ranges[i]**2) * np.cos(np.deg2rad(180 - (i - 540) / 4))
-        cY += 5
+        cY += 20
 
         return np.rad2deg(math.atan2(cY, cX))
 
