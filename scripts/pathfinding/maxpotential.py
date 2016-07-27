@@ -16,13 +16,17 @@ class MaxPotential:
 
     def scan_received(self, msg):
         q = 0.1
-        charges = [(q/(x**2), math.radians((i-180)/4))
+        charges = [(q/(((x + 0.01)**2)), math.radians((i-180)/4))
                    for x, i in enumerate(msg.ranges)]
+        for(x, i) in enumerate(msg.ranges):
+            print(i)
         coords = [(x[0] * np.cos(x[1]), x[0] * np.sin(x[1])) for x in charges]
+        print(coords[700])
         xs = reduce(lambda prev, coord: prev + coord[0], coords)
         ys = reduce(lambda prev, coord: prev + coord[1], coords)
-
-        p_speed = 0.2
+        xs = xs[0]
+        ys = ys[0]
+        p_speed = 0.0002
         p_angle = 1
         boost = 1
 
