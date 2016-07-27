@@ -37,12 +37,12 @@ class Fieldnav:
 	    vx+=self.coordconvert(scan.ranges[i], i)[0]
 	    vy+=self.coordconvert(scan.ranges[i], i)[1]
 
-	vxo = math.atan2(vx*.001, vy)
-	vyo = (vy * -.0006) + 1.5
+	vxo = math.atan2(vx*.001, vy*-.0006)
+	vyo = (vy * -.0006) + 1.2
 
-	self.drive(vx, vy)
+	self.drive(vxo, vyo)
 
-	print str(vx) + "," + str(vy)
+	print str(vxo) + "," + str(vyo)
 	   
 
 if __name__ == '__main__':
