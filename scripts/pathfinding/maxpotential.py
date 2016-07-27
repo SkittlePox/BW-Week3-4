@@ -19,6 +19,7 @@ class MaxPotential:
         charges = [(q/((x + 0.01)**2), math.radians((i-180)/4))
                    for x, i in enumerate(msg.ranges)]
         coords = [(x[0] * np.cos(x[1]), x[0] * np.sin(x[1])) for x in charges]
+        print(coords)
         xs = reduce(lambda prev, coord: prev + coord[0], coords)
         ys = reduce(lambda prev, coord: prev + coord[1], coords)
         print(xs, ys)
