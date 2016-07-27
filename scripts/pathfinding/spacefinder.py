@@ -79,26 +79,28 @@ class spacefinder:
         left_far = centerIndex + 120
         right_far = centerIndex - 120
 
-        ranges = [0.2, 0.25, 0.4]
+        vals = [0.2, 0.25, 0.4]
 
         leftPoints = [left, left_mid, left_far]
         rightPoints = [right, right_mid, right_far]
 
-        certaintyAvg = 0    # How certain we are
-        clarityAvg = 0    # How clear the path is perceived as
+        certaintyAvg = 0.001    # How certain we are
+        clarityAvg = 0.001    # How clear the path is perceived as
 
         for l in range(0, len(leftPoints)):
-            if(leftPoints[l] < 1076 and leftPoints[l] >= 5):
+            if(leftPoints[l] < 1075 and leftPoints[l] >= 6):
                 certaintyAvg += 1
+                print(ranges)
                 print(ranges[leftPoints[l]-4:leftPoints[l]+4])
                 print(leftPoints[l])
-                if(min(ranges[leftPoints[l]-4:leftPoints[l]+4]) < ranges[l]):
+                print(ranges[leftPoints[l]])
+                if(min(ranges[leftPoints[l]-4:leftPoints[l]+4]) < vals[l]):
                     clarityAvg += 1
 
         for r in range(0, len(rightPoints)):
-            if(rightPoints[r] < 1076 and rightPoints[r] >= 5):
+            if(rightPoints[r] < 1075 and rightPoints[r] >= 6):
                 certaintyAvg += 1
-                if(min(ranges[rightPoints[rpdb]-4:rightPoints[r]+4]) < ranges[r]):
+                if(min(ranges[rightPoints[r]-4:rightPoints[r]+4]) < vals[r]):
                     clarityAvg += 1
 
         return clarityAvg/6.0, certaintyAvg/6.0
