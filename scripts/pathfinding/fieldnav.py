@@ -29,7 +29,7 @@ class Fieldnav:
 	return (math.cos(angle)/squrad, math.sin(angle)/squrad)
 
     def parsescan(self, scan):
-	
+
 	vx=0.0;
 	vy=0.0;
 
@@ -38,16 +38,16 @@ class Fieldnav:
 	for i in range(380,700):
 	    vx-=self.coordconvert(scan.ranges[i], i)[0]
 	    vy-=self.coordconvert(scan.ranges[i], i)[1]
-	
+
 	vyo = vy * valscale + .5
 	vxo = -20*math.atan2(vx * valscale, vyo)
 
 	self.drive(vxo, vyo)
 
 	print str(vxo) + "," + str(vyo)
-	   
+
 
 if __name__ == '__main__':
-	
+
     node = Fieldnav()
     rospy.spin()
