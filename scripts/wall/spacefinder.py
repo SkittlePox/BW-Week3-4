@@ -15,7 +15,8 @@ class spacefinder:
 
     def drive_control(self, msg):
         #Main function
-        error = (540 - self.findLongest(msg.ranges)) * -1
+        #error = (540 - self.findLongest(msg.ranges)) * -1
+        error = (540 - self.findMostClear(msg.ranges)) * -1
         angle = error * self.kp
 
         drive_command = AckermannDriveStamped()
@@ -66,7 +67,7 @@ class spacefinder:
 
         threshold = 0.83
         for i in range(0, len(slices)):
-            clarity, certainty = isClearPath(ranges, indices[i])
+            clarity, certainty = self.isClearPath(ranges, indices[i])
             if(clarity * certainty >= threshold):
                 return indices[i]
 
@@ -87,13 +88,15 @@ class spacefinder:
         clarityAvg = 0    # How clear the path is perceived as
 
         for l in range(0, len(leftPoints)):
-            if(leftPoints[l] < 1080 && leftPoints[l] >= 0):
+            if(leftPoints[l] < 1080 and leftPoints[l] >= 0):
                 certaintyAvg += 1
+                print(ranges[leftPoints[l]-4:leftPoints[l]+4])
+                print(leftPoints[l])
                 if(min(ranges[leftPoints[l]-4:leftPoints[l]+4]) < ranges[l]):
                     clarityAvg += 1
 
         for r in range(0, len(rightPoints)):
-            if(rightPoints[r] < 1080 && rightPoints[r] >= 0):
+            if(rightPoints[r] < 1080 and rightPoints[r] >= 0):
                 certaintyAvg += 1
                 if(min(ranges[rightPoints[rpdb]-4:rightPoints[r]+4]) < ranges[r]):
                     clarityAvg += 1
