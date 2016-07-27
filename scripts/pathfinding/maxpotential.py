@@ -2,6 +2,7 @@
 
 import rospy
 import math
+import numpy as np
 from ackermann_msgs.msg import AckermannDriveStamped
 from sensor_msgs.msg import LaserScan
 
@@ -14,16 +15,19 @@ class MaxPotential:
         rospy.Subscriber("/scan", LaserScan, self.scan_received)
 
     def scan_received(self, msg):
-        print(self.calculateCharges(msg))
-        # self.drive(self.calculateAngle(msg), self.calculateSpeed(msg))
+        q = 0.1
+        charges = [(q/(x**2), math.radians((i-180)/4)) for x, i in msg.ranges]
+        coords = [(x[0] * np.cos(x[1]), x[0] * np.sin(x[1])) for x in charges]
+        xs = reduce(lambda prev, coord: prev + coord[0], coords)
+        ys = reduce(lambda prev, coord: prev + coord[1], coords)
 
-    # def calculateSpeed(self, msg):
+        p_speed = 0.2
+        p_angle = 1
 
-    # def calculateAngle(self, msg):
-
-
-    def calculateCharges(self, msg):
-        return [1/(x**2) for x in msg.ranges]
+        speed = p_speed * math.sqrt(xs**2 + ys**2) * np.sign(x)
+        angle = p_angle * math.atan2(y, x) * np.sign(x)
+        print(angle, speed)
+        self.drive(angle, speed)
 
     def drive(self, angle, speed):
         msg = AckermannDriveStamped()
