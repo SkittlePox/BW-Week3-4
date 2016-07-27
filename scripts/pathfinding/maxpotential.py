@@ -16,7 +16,7 @@ class MaxPotential:
 
     def scan_received(self, msg):
         q = 0.1
-        charges = [(q/(((x + 0.01)**2)), math.radians((i-180)/4))
+        charges = [(q/(((x + 0.01)**2)), math.radians(i/4-135))
                    for x, i in enumerate(msg.ranges)]
         for(x, i) in enumerate(msg.ranges):
             print(i)
