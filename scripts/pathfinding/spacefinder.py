@@ -60,16 +60,19 @@ class spacefinder:
         for i in range(0, len(slices)):
             maxIndex = i
             for x in range(i, len(slices)):
-                if(slices[i] > slices[maxIndex]):
+                if(slices[i] < slices[maxIndex]):
                     maxIndex = i
             slices[i], slices[maxIndex] = slices[maxIndex], slices[i]
             indices[i], indices[maxIndex] = indices[maxIndex], indices[i]   # Flips indices around
 
-        threshold = 0.83
+        threshold = 0.5
         for i in range(0, len(slices)):
+            print(i)
             clarity, certainty = self.isClearPath(ranges, indices[i])
+            print(clarity, certainty)
             if(clarity * certainty >= threshold):
                 return indices[i]
+        return 540
 
     def isClearPath(self, ranges, centerIndex):
         left = centerIndex + 360
@@ -90,10 +93,6 @@ class spacefinder:
         for l in range(0, len(leftPoints)):
             if(leftPoints[l] < 1075 and leftPoints[l] >= 6):
                 certaintyAvg += 1
-                print(ranges)
-                print(ranges[leftPoints[l]-4:leftPoints[l]+4])
-                print(leftPoints[l])
-                print(ranges[leftPoints[l]])
                 if(min(ranges[leftPoints[l]-4:leftPoints[l]+4]) < vals[l]):
                     clarityAvg += 1
 

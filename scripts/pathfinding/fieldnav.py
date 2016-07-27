@@ -33,14 +33,14 @@ class Fieldnav:
 	vx=0.0;
 	vy=0.0;
 
-	valscale=-.0006
+	valscale=.0006
 
 	for i in range(380,700):
-	    vx+=self.coordconvert(scan.ranges[i], i)[0]
-	    vy+=self.coordconvert(scan.ranges[i], i)[1]
+	    vx-=self.coordconvert(scan.ranges[i], i)[0]
+	    vy-=self.coordconvert(scan.ranges[i], i)[1]
 	
-	vyo = (vy * valscale) + 1.2
-	vxo = -20*math.atan2(vx*valscale, vyo)
+	vyo = vy * valscale + .5
+	vxo = -20*math.atan2(vx * valscale, vyo)
 
 	self.drive(vxo, vyo)
 
