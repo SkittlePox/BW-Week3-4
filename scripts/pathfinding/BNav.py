@@ -22,7 +22,9 @@ class BNav:
         self.drivepub.publish(dmsg)
 
     def nav(self, msg):     # Main navigation function
-        print(self.calcResultantVector(msg.ranges))
+        resultantAngle = self.calcResultantVector(msg.ranges)
+        print(resultantAngle)
+        self.drive(resultantAngle, 0)
 
     def calcResultantVector(self, ranges):  # Translates each LIDAR value into a vector and then adds them
         cX = 0  # Cartesian X
