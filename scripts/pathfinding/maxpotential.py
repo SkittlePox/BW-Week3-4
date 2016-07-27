@@ -26,8 +26,8 @@ class MaxPotential:
         p_angle = 1
         boost = 1
 
-        speed = (p_speed * math.sqrt(xs**2 + ys**2) * np.sign(x)) + boost
-        angle = p_angle * math.atan2(y, x) * np.sign(x)
+        speed = (p_speed * math.sqrt(xs**2 + ys**2) * np.sign(xs)) + boost
+        angle = p_angle * math.atan2(ys, xs) * np.sign(xs)
         print(angle, speed)
         self.drive(angle, speed)
 
