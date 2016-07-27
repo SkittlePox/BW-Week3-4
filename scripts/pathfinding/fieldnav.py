@@ -16,7 +16,7 @@ class Fieldnav:
 	self.drivepub = rospy.Publisher('/vesc/ackermann_cmd_mux/input/navigation', AckermannDriveStamped, queue_size=1)
 #	self.right=-1
 	self.backcharge=.8
-		
+	self.mincharge=-1		
 
     def drive(self, angle, speed):
 
@@ -27,7 +27,10 @@ class Fieldnav:
         self.drivepub.publish(ackmsg)
 
     def capcharge(self, charge):
-	if charge < -
+	if charge < mincharge:
+	    return mincharge
+	else:
+	    return charge
 
     def coordconvert(self, radius, index):
 	squrad=radius*radius
@@ -61,7 +64,7 @@ class Fieldnav:
 
 	if vyo<vmin and -2<vyo:
 	    self.backcharge-=.1 
-	    vyo=vy+self.backcharge
+	    vyo=vy+self.capcharge(self.backcharge)
 	    print "backminus: "+str(self.backcharge)
 	else:
 	    self.backcharge = .8
