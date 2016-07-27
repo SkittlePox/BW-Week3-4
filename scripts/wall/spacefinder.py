@@ -41,6 +41,67 @@ class spacefinder:
                 max = i
         return max + 180
 
+    def findMostClear(self, ranges):
+        bound = 200
+        rangenum = 120
+
+        slices = []
+        for i in range(bound, 1081-bound):
+            summ = 0
+            for x in range(0, (rangenum+1)/2):
+                if x != 0:
+                    summ += ranges[i+x]
+                summ += ranges[i-x]
+            summ /= rangenum
+            slices.append(summ)
+        indices = range(bound, bound + len(slices))
+
+        for i in range(0, len(slices)):
+            maxIndex = i
+            for x in range(i, len(slices)):
+                if(slices[i] > slices[maxIndex]):
+                    maxIndex = i
+            slices[i], slices[maxIndex] = slices[maxIndex], slices[i]
+            indices[i], indices[maxIndex] = indices[maxIndex], indices[i]   # Flips indices around
+
+        threshold = 0.83
+        for i in range(0, len(slices)):
+            clarity, certainty = isClearPath(ranges, indices[i])
+            if(clarity * certainty >= threshold):
+                return indices[i]
+
+    def isClearPath(self, ranges, centerIndex):
+        left = centerIndex + 360
+        right = centerIndex - 360
+        left_mid = centerIndex + 240
+        right_mid = centerIndex - 240
+        left_far = centerIndex + 120
+        right_far = centerIndex - 120
+
+        ranges = [0.2, 0.25, 0.4]
+
+        leftPoints = [left, left_mid, left_far]
+        rightPoints = [right, right_mid, right_far]
+
+        certaintyAvg = 0    # How certain we are
+        clarityAvg = 0    # How clear the path is perceived as
+
+        for l in range(0, len(leftPoints)):
+            if(leftPoints[l] < 1080 && leftPoints[l] >= 0):
+                certaintyAvg += 1
+                if(min(ranges[leftPoints[l]-4:leftPoints[l]+4]) < ranges[l]):
+                    clarityAvg += 1
+
+        for r in range(0, len(rightPoints)):
+            if(rightPoints[r] < 1080 && rightPoints[r] >= 0):
+                certaintyAvg += 1
+                if(min(ranges[rightPoints[rpdb]-4:rightPoints[r]+4]) < ranges[r]):
+                    clarityAvg += 1
+
+        return clarityAvg/6.0, certaintyAvg/6.0
+
+    #TODO Implement function for calculating clear path
+
 if __name__ == "__main__":
     node = spacefinder()
     rospy.spin()
