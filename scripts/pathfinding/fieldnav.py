@@ -14,8 +14,9 @@ class Fieldnav:
 	rospy.init_node("Fieldnav")
 	rospy.Subscriber('scan', LaserScan, self.parsescan)
 	self.drivepub = rospy.Publisher('/vesc/ackermann_cmd_mux/input/navigation', AckermannDriveStamped, queue_size=1)
-	self.right=-1
+#	self.right=-1
 	self.backcharge=.8
+		
 
     def drive(self, angle, speed):
 
@@ -24,6 +25,9 @@ class Fieldnav:
         ackmsg.drive.steering_angle = angle
 
         self.drivepub.publish(ackmsg)
+
+    def capcharge(self, charge):
+	if charge < -
 
     def coordconvert(self, radius, index):
 	squrad=radius*radius
@@ -55,7 +59,7 @@ class Fieldnav:
 	vyo = vy+self.backcharge
 	vxo = steercoeff*math.atan2(vx, vyo)
 
-	if vyo<vmin and -1<vyo:
+	if vyo<vmin and -2<vyo:
 	    self.backcharge-=.1 
 	    vyo=vy+self.backcharge
 	    print "backminus: "+str(self.backcharge)
