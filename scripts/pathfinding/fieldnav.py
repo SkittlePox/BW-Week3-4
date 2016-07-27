@@ -25,20 +25,24 @@ class Fieldnav:
 
     def coordconvert(self, radius, index):
 	squrad=radius*radius
-	angle=math.radians((index-180)/6)
-	return (math.cos(angle)/squrad, math.sin(angle)*math.sin(angle)/squrad)
+	angle=math.radians((index-180)/4)
+	return (math.cos(angle)/squrad, math.sin(angle)/squrad)
 
     def parsescan(self, scan):
 	
 	vx=0.0;
 	vy=0.0;
 
-	for i in range(180,900):
+	for i in range(380,700):
 	    vx+=self.coordconvert(scan.ranges[i], i)[0]
 	    vy+=self.coordconvert(scan.ranges[i], i)[1]
 
-	self.drive(vx*.001, (vy*-.0006)+1.2)
-	print str(vx*.001) + "," + str(vy*.0006)
+	vxo = math.atan2(vx*.001, vy)
+	vyo = (vy * -.0006) + 1.2
+
+	self.drive(vx, vy)
+
+	print str(vx) + "," + str(vy)
 	   
 
 if __name__ == '__main__':
