@@ -88,7 +88,7 @@ class spacefinder:
         clarityAvg = 0    # How clear the path is perceived as
 
         for l in range(0, len(leftPoints)):
-            if(leftPoints[l] < 1080 and leftPoints[l] >= 0):
+            if(leftPoints[l] < 1076 and leftPoints[l] >= 5):
                 certaintyAvg += 1
                 print(ranges[leftPoints[l]-4:leftPoints[l]+4])
                 print(leftPoints[l])
@@ -96,7 +96,7 @@ class spacefinder:
                     clarityAvg += 1
 
         for r in range(0, len(rightPoints)):
-            if(rightPoints[r] < 1080 and rightPoints[r] >= 0):
+            if(rightPoints[r] < 1076 and rightPoints[r] >= 5):
                 certaintyAvg += 1
                 if(min(ranges[rightPoints[rpdb]-4:rightPoints[r]+4]) < ranges[r]):
                     clarityAvg += 1
