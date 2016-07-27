@@ -35,9 +35,9 @@ class Fieldnav:
 	vy=0.0;
 
 	valscale = .0006
-	backcharge = .5
-	steercoeff = 5
-#	vmin = .1
+	backcharge = .8
+	steercoeff = -2
+	vmin = .1
 #	stoprange=.4
 #	backspeed=-.5
 
@@ -48,12 +48,19 @@ class Fieldnav:
 	vx*=valscale
 	vy*=valscale
 
-	vyo = -(math.sqrt(vy*vy+vx*vx) + backcharge)*numpy.sign(vy)
-	vxo = steercoeff*math.atan2(vx, vyo)*numpy.sign(vy)
+#	vyo = -(math.sqrt(vy*vy+vx*vx) + backcharge)*numpy.sign(vy)
+#	vxo = steercoeff*math.atan2(vx, vyo)*numpy.sign(vy)
 
-#	if math.fabs(vyo)<vmin:
-#	    vyo = -1
-#	    vxo=self.right
+	vyo = vy+backcharge
+	vxo = steercoeff*math.atan2(vx, vyo)
+
+	if math.fabs(vyo)<vmin:
+	    backcharge-=.1 
+	    vyo=vy+backcharge
+	    print "backminus: "+str(backcharge)
+	else:
+	    backcharge = .8
+
 #	    self.right*=-1
 #	if min(scan.ranges[480:600])<stoprange:
 #	    vxo=0
