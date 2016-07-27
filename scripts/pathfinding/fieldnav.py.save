@@ -15,7 +15,6 @@ class Fieldnav:
 	rospy.Subscriber('scan', LaserScan, self.parsescan)
 	self.drivepub = rospy.Publisher('/vesc/ackermann_cmd_mux/input/navigation', AckermannDriveStamped, queue_size=1)
 	self.right=-1
-	self.backcharge=.8
 
     def drive(self, angle, speed):
 
@@ -36,15 +35,16 @@ class Fieldnav:
 	vy=0.0;
 
 	valscale = .0006
-#	backcharge = .8
+	backcharge = .8
 	steercoeff = -2
-	vmin = .3
+	vmin = .1
 #	stoprange=.4
 #	backspeed=-.5
 
 	for i in range(180,900):
 	    vx-=self.coordconvert(scan.ranges[i], i)[0]
 	    vy-=self.coordconvert(scan.ranges[i], i)[1]
+<<<<<<< HEAD
 	
 	vx*=valscale
 	vy*=valscale
@@ -52,23 +52,21 @@ class Fieldnav:
 #	vyo = -(math.sqrt(vy*vy+vx*vx) + backcharge)*numpy.sign(vy)
 #	vxo = steercoeff*math.atan2(vx, vyo)*numpy.sign(vy)
 
-	vyo = vy+self.backcharge
+	vyo = vy+backcharge
 	vxo = steercoeff*math.atan2(vx, vyo)
 
-	if vyo<vmin and -1<vyo:
-	    self.backcharge-=.1 
-	    vyo=vy+self.backcharge
-	    print "backminus: "+str(self.backcharge)
+	if math.fabs(vyo)<vmin:
+	    backcharge-=.1 
+	    vyo=vy+backcharge
+	    print "backminus: "+str(backcharge)
 	else:
-	    self.backcharge = .8
-	    print "reset"
+	    backcharge = .8
 
 #	    self.right*=-1
 #	if min(scan.ranges[480:600])<stoprange:
 #	    vxo=0
 #	    vyo=backspeed
-
-	self.drive(vxo, vyo)
+yo)
 
 	print str(vxo) + "," + str(vyo)
 
