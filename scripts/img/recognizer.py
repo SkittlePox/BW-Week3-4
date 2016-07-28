@@ -18,7 +18,7 @@ class Recog:
         self.pub_image = rospy.Publisher("/echo_image", Image, queue_size=1)
         self.pub_found = rospy.Publisher("/exploring_challenge", String, queue_size=1)
         self.bridge = CvBridge()
-	self.count = 0
+        self.count = 0
         self.the_time = rospy.Time.now()
 
     def cbImage(self, image_msg):
@@ -30,7 +30,7 @@ class Recog:
         if not self.thread_lock.acquire(False):
             return
         image_cv = self.bridge.imgmsg_to_cv2(image_msg)
-	display_text = " "
+        display_text = " "
         # Image processing starts here
         face = self.face_search(image_cv)
 
@@ -42,24 +42,24 @@ class Recog:
             cv2.putText(image_cv, display_text, (face[0] + face[0] / 2, face[1] + 3 * face[3] / 4), font, 4, (255, 255, 255), 2)
         else:
             the_one, color_scheme, display_text = self.color_search(image_cv)
-	    if not (the_one is None):
-            	# Drawing contours
-            	cv2.drawContours(image_cv, [the_one], -1, (color_scheme.b, color_scheme.g, color_scheme.r))
-            	x, y, w, h = cv2.boundingRect(the_one)
-            	cv2.rectangle(image_cv, (x, y), (x + w, y + h), (color_scheme.b, color_scheme.g, color_scheme.r, 2))
-            	cv2.circle(image_cv, (x + w / 2, y + h / 2), 4, (255, 255, 255), -1)
-            	font = cv2.FONT_HERSHEY_SIMPLEX
-            	cv2.putText(image_cv, display_text, (x + w / 2, y + 3 * h / 4), font, 2, (255, 255, 255), 2)
-	if(display_text is None):
-	    display_text = " "
+            if not (the_one is None):
+                # Drawing contours
+                cv2.drawContours(image_cv, [the_one], -1, (color_scheme.b, color_scheme.g, color_scheme.r))
+                x, y, w, h = cv2.boundingRect(the_one)
+                cv2.rectangle(image_cv, (x, y), (x + w, y + h), (color_scheme.b, color_scheme.g, color_scheme.r, 2))
+                cv2.circle(image_cv, (x + w / 2, y + h / 2), 4, (255, 255, 255), -1)
+                font = cv2.FONT_HERSHEY_SIMPLEX
+                cv2.putText(image_cv, display_text, (x + w / 2, y + 3 * h / 4), font, 2, (255, 255, 255), 2)
+        if(display_text is None):
+            display_text = " "
         # Image processing stops here
-	if (display_text is not " " and rospy.Time.now()- self.the_time  >= rospy.Duration(2,0)):
+        if (display_text is not " " and rospy.Time.now() - self.the_time >= rospy.Duration(2, 0)):
             self.pub_found.publish("Found {0}".format(display_text))
             cv2.imwrite("/home/racecar/challenge_photos/{0}{1}.png".format(display_text, self.count), image_cv)
-	    self.count += 1
-	    print(rospy.Time.now()-self.the_time)
-	    print(rospy.Time.now(), self.the_time)
-	    self.the_time = rospy.Time.now()
+            self.count += 1
+            print(rospy.Time.now() - self.the_time)
+            print(rospy.Time.now(), self.the_time)
+            self.the_time = rospy.Time.now()
         #self.pub_image.publish(self.bridge.cv2_to_imgmsg(image_cv, "bgr8"))
 
         self.thread_lock.release()
@@ -95,7 +95,7 @@ class Recog:
 
         cv2.rectangle(image_cv, (x, y), (x + w, y + h), (0, 255, 0), 2)
 
-        image_crop = image_cv[y:y+h, x:x+w]    # Just the face
+        image_crop = image_cv[y:y + h, x:x + w]    # Just the face
         image_hsv = cv2.cvtColor(image_crop, cv2.COLOR_BGR2HSV)
 
         filters_ari = [np.array([8, 110, 100]), np.array([12, 255, 225])]  # Ari
@@ -113,7 +113,7 @@ class Recog:
                     sertac_count += 1
                 else:
                     sertac_count -= 1
-        #print(sertac_count)
+        # print(sertac_count)
 
         for i in range(0, len(mask_ari)):
             for j in range(0, len(mask_ari[i])):
@@ -121,7 +121,7 @@ class Recog:
                     ari_count += 1
                 else:
                     ari_count -= 1
-        #print(ari_count)
+        # print(ari_count)
         who = ""
         if(sertac_count > ari_count):
             who = "sertac"
@@ -198,8 +198,8 @@ class Recog:
                 the_one = largest_contours[i]
                 display_text = colors[i]
                 color_scheme = color_objects[i]
-	if (cv2.contourArea(the_one) < 7000):
-	    return None, None, None
+        if (cv2.contourArea(the_one) < 7000):
+            return None, None, None
 
         return the_one, color_scheme, display_text
 
