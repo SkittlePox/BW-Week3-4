@@ -16,7 +16,7 @@ class Recog:
         self.node_name = "Recog"
         self.thread_lock = threading.Lock()
         self.sub_image = rospy.Subscriber("/camera/rgb/image_rect_color", Image, self.cbImage, queue_size=1)
-        self.pub_image = rospy.Publisher("~echo_image", Image, queue_size=1)
+        self.pub_image = rospy.Publisher("/echo_image", Image, queue_size=1)
         self.pub_found = rospy.Publisher("/exploring_challenge", std_msgs / String, queue_size=1)
         self.bridge = CvBridge()
         self.the_time = time.clock()
