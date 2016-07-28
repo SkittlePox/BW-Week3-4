@@ -55,7 +55,7 @@ class Recog:
         # Image processing stops here
 	if (display_text is not " " and rospy.Time.now()- self.the_time  >= rospy.Duration(2,0)):
             self.pub_found.publish("Found {0}".format(display_text))
-            cv2.imwrite("~/racecar/challenge_photos/{0}{1}.png".format(display_text, self.count), image_cv)
+            cv2.imwrite("/home/racecar/challenge_photos/{0}{1}.png".format(display_text, self.count), image_cv)
 	    self.count += 1
 	    print(rospy.Time.now()-self.the_time)
 	    print(rospy.Time.now(), self.the_time)
@@ -198,7 +198,7 @@ class Recog:
                 the_one = largest_contours[i]
                 display_text = colors[i]
                 color_scheme = color_objects[i]
-	if (cv2.contourArea(the_one) < 10000):
+	if (cv2.contourArea(the_one) < 7000):
 	    return None, None, None
 
         return the_one, color_scheme, display_text
