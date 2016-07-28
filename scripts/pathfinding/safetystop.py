@@ -26,7 +26,7 @@ class safetystop:
 
     def parsescan(self, scan):
 
-	if min(scan.ranges[0:1080])<.1:
+	if min(scan.ranges[360:700])<.2:
 	    self.drive(0,0)
 	    print "stop"
 

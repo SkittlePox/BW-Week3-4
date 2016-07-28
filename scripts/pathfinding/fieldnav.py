@@ -44,7 +44,7 @@ class Fieldnav:
 
 	valscale = .0006
 #	backcharge = .8
-	steercoeff = -2
+	steercoeff = -6
 	vmin = .25
 #	stoprange=.4
 #	backspeed=-.5
