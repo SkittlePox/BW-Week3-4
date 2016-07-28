@@ -38,9 +38,9 @@ class Recog:
         if (face is not None):
             # Drawing rectangle for face
             display_text = self.faceClasify(face, image_cv)
-            cv2.rectangle(image, (face.x, face.y), (face.x + face.w, face.y + face.h), (0, 255, 0), 2)
+            cv2.rectangle(image, (face[0], face[1]), (face[0] + face[2], face[1] + face[3]), (0, 255, 0), 2)
             font = cv2.FONT_HERSHEY_SIMPLEX
-            cv2.putText(image_cv, display_text, (face.x + face.x / 2, face.y + 3 * face.h / 4), font, 4, (255, 255, 255), 2, cv2.LINE_AA)
+            cv2.putText(image_cv, display_text, (face[0] + face[0] / 2, face[1] + 3 * face[3] / 4), font, 4, (255, 255, 255), 2)
         else:
             # Drawing contours
             cv2.drawContours(image_cv, [the_one], -1, (color_scheme.b, color_scheme.g, color_scheme.r))
@@ -48,18 +48,18 @@ class Recog:
             cv2.rectangle(image_cv, (x, y), (x + w, y + h), (color_scheme.b, color_scheme.g, color_scheme.r, 2))
             cv2.circle(image_cv, (x + w / 2, y + h / 2), 4, (255, 255, 255), -1)
             font = cv2.FONT_HERSHEY_SIMPLEX
-            cv2.putText(image_cv, display_text, (x + x / 2, y + 3 * h / 4), font, 4, (255, 255, 255), 2, cv2.LINE_AA)
+            cv2.putText(image_cv, display_text, (x + x / 2, y + 3 * h / 4), font, 4, (255, 255, 255), 2)
         # Image processing stops here
 
         print("Running")
-        self.pub_found.publish("Found", display_text)
-        self.pub_image.publish(self.bridge.cv2_to_imgmsg(image_cv, display_text))
+        self.pub_found.publish("Found" + display_text)
+        self.pub_image.publish(self.bridge.cv2_to_imgmsg(image_cv))
         #cv2.imwrite("~/racecar/challenge_photos/%s.png"%(display_text), image_cv)
 
-        self.thread_lock.release()
+        #self.thread_lock.release()
 
     def face_search(self, image_cv):
-        faceCascade = cv2.CascadeClassifier("haarcascade_frontalface_default.xml")
+        faceCascade = cv2.CascadeClassifier("haarcascade_frontalface_default[0]ml")
         gray = cv2.cvtColor(image_cv, cv2.COLOR_BGR2GRAY)
         faces = faceCascade.detectMultiScale(   # Finds faces
             gray,
@@ -74,7 +74,8 @@ class Recog:
         maxIndex = 0
         index = 0
         for (x, y, w, h) in faces:  # Finds largest face
-            if(h * w > faces[maxIndex].h * faces[maxIndex].w):
+            print(faces[maxIndex])
+            if(h * w > faces[maxIndex][3] * faces[maxIndex][2]):
                 maxIndex = index
             index += 1
 
@@ -82,10 +83,10 @@ class Recog:
         return the_face
 
     def faceClasify(self, the_face, image_cv):
-        x = the_face.x
-        y = the_face.y
-        w = the_face.w
-        h = the_face.h
+        x = the_face[0]
+        y = the_face[1]
+        w = the_face[2]
+        h = the_face[3]
 
         cv2.rectangle(image_cv, (x, y), (x + w, y + h), (0, 255, 0), 2)
 
