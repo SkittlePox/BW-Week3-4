@@ -22,7 +22,7 @@ class MaxPotential:
         print(coords[700][0])
         xs = reduce(lambda prev, coord: prev + coord[0], coords)
         ys = reduce(lambda prev, coord: prev + coord[1], coords)
-        xs = -xs[0]
+        xs = xs[0]
         ys = ys[0]
         p_speed = 0.0002
         p_angle = 1
