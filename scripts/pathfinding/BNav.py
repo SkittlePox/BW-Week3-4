@@ -23,7 +23,7 @@ class BNav:
 
     def nav(self, msg):     # Main navigation function
         resultantAngle = self.calcResultantVector(msg.ranges)
-        angle = (resultantAngle-90)/45
+        angle = (resultantAngle-90)/90
         print(resultantAngle, angle)
         self.drive(angle, 0)
 
