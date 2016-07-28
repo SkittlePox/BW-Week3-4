@@ -30,29 +30,29 @@ class Recog:
         if not self.thread_lock.acquire(False):
             return
         image_cv = self.bridge.imgmsg_to_cv2(image_msg)
-
+	display_text = " "
         # Image processing starts here
-        the_one, color_scheme, display_text = self.color_search(image_cv)
-        face = self.face_search(image_cv)
+        #face = self.face_search(image_cv)
 
-        if (face is not None):
+        if (False):#(face is not None):
             # Drawing rectangle for face
             display_text = self.faceClasify(face, image_cv)
             cv2.rectangle(image_cv, (face[0], face[1]), (face[0] + face[2], face[1] + face[3]), (0, 255, 0), 2)
             font = cv2.FONT_HERSHEY_SIMPLEX
             cv2.putText(image_cv, display_text, (face[0] + face[0] / 2, face[1] + 3 * face[3] / 4), font, 4, (255, 255, 255), 2)
         else:
-            # Drawing contours
-            cv2.drawContours(image_cv, [the_one], -1, (color_scheme.b, color_scheme.g, color_scheme.r))
-            x, y, w, h = cv2.boundingRect(the_one)
-            cv2.rectangle(image_cv, (x, y), (x + w, y + h), (color_scheme.b, color_scheme.g, color_scheme.r, 2))
-            cv2.circle(image_cv, (x + w / 2, y + h / 2), 4, (255, 255, 255), -1)
-            font = cv2.FONT_HERSHEY_SIMPLEX
-            cv2.putText(image_cv, display_text, (x + x / 2, y + 3 * h / 4), font, 4, (255, 255, 255), 2)
+            the_one, color_scheme, display_text = self.color_search(image_cv)
+	    if not (the_one is None):
+            	# Drawing contours
+            	cv2.drawContours(image_cv, [the_one], -1, (color_scheme.b, color_scheme.g, color_scheme.r))
+            	x, y, w, h = cv2.boundingRect(the_one)
+            	cv2.rectangle(image_cv, (x, y), (x + w, y + h), (color_scheme.b, color_scheme.g, color_scheme.r, 2))
+            	cv2.circle(image_cv, (x + w / 2, y + h / 2), 4, (255, 255, 255), -1)
+            	font = cv2.FONT_HERSHEY_SIMPLEX
+            	cv2.putText(image_cv, display_text, (x + w / 2, y + 3 * h / 4), font, 2, (255, 255, 255), 2)
         # Image processing stops here
-
-        print("Running")
-        self.pub_found.publish("Found" + display_text)
+	if (display_text != " "):
+            self.pub_found.publish("Found {0}".format(display_text))
         self.pub_image.publish(self.bridge.cv2_to_imgmsg(image_cv, "bgr8"))
         #cv2.imwrite("~/racecar/challenge_photos/%s.png"%(display_text), image_cv)
 
@@ -63,7 +63,7 @@ class Recog:
         gray = cv2.cvtColor(image_cv, cv2.COLOR_BGR2GRAY)
         faces = faceCascade.detectMultiScale(   # Finds faces
             gray,
-            scaleFactor=1.1,
+            scaleFactor=1.2,
             minNeighbors=5,
             minSize=(30, 30),
             flags=cv2.CASCADE_SCALE_IMAGE
@@ -74,7 +74,6 @@ class Recog:
         maxIndex = 0
         index = 0
         for (x, y, w, h) in faces:  # Finds largest face
-            print(faces[maxIndex])
             if(h * w > faces[maxIndex][3] * faces[maxIndex][2]):
                 maxIndex = index
             index += 1
@@ -131,8 +130,8 @@ class Recog:
         filters_red = [np.array([0, 165, 100]), np.array([6, 255, 255])]  # Red
         filters_red2 = [np.array([170, 165, 170]), np.array([180, 255, 255])]  # Red
         filters_green = [np.array([60, 100, 60]), np.array([88, 255, 255])]  # Green
-        filters_yellow = [np.array([24, 191, 114]), np.array([33, 255, 156])]  # Yellow
-        filters_blue = [np.array([106, 127, 51]), np.array([127, 255, 166])]  # Blue
+        filters_yellow = [np.array([24, 170, 114]), np.array([33, 255, 190])]  # Yellow
+        filters_blue = [np.array([106, 127, 51]), np.array([127, 255, 215])]  # Blue
 
         mask_red = cv2.inRange(image_hsv, filters_red[0], filters_red[1])
         mask_red2 = cv2.inRange(image_hsv, filters_red2[0], filters_red2[1])
@@ -194,6 +193,8 @@ class Recog:
                 display_text = colors[i]
                 color_scheme = color_objects[i]
                 self.the_time = time.clock()
+	if (cv2.contourArea(the_one) < 20000):
+	    return None, None, None
 
         return the_one, color_scheme, display_text
 
