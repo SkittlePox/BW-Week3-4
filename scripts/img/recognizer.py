@@ -7,7 +7,6 @@ from sensor_msgs.msg import Image
 from std_msgs.msg import *
 from cv_bridge import CvBridge, CvBridgeError
 from geometry_msgs.msg import Point
-from racecar.msg import BlobDetections
 import threading
 
 
@@ -52,6 +51,7 @@ class Recog:
             cv2.putText(image_cv, display_text, (x + x / 2, y + 3 * h / 4), font, 4, (255, 255, 255), 2, cv2.LINE_AA)
         # Image processing stops here
 
+        print("Running")
         self.pub_found.publish("Found", display_text)
         self.pub_image.publish(self.bridge.cv2_to_imgmsg(image_cv, display_text))
         #cv2.imwrite("~/racecar/challenge_photos/%s.png"%(display_text), image_cv)
