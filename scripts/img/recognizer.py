@@ -32,7 +32,7 @@ class Recog:
         image_cv = self.bridge.imgmsg_to_cv2(image_msg)
 
         # Image processing starts here
-        color_contour, color_scheme, display_text = self.color_search(image_cv)
+        the_one, color_scheme, display_text = self.color_search(image_cv)
         face = self.face_search(image_cv)
 
         if (face is not None):
