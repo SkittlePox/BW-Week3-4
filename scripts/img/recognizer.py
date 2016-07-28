@@ -25,6 +25,7 @@ class Recog:
         thread = threading.Thread(target=self.processImage, args=(image_msg,))
         thread.setDaemon(True)
         thread.start()
+        self.processImage(image_msg)
 
     def processImage(self, image_msg):
         if not self.thread_lock.acquire(False):
