@@ -2,7 +2,6 @@
 import cv2
 import rospy
 import numpy as np
-import time
 from sensor_msgs.msg import Image
 from std_msgs.msg import *
 from cv_bridge import CvBridge, CvBridgeError
@@ -20,7 +19,7 @@ class Recog:
         self.pub_found = rospy.Publisher("/exploring_challenge", String, queue_size=1)
         self.bridge = CvBridge()
 	self.count = 0
-        self.the_time = 0
+        self.the_time = rospy.Time.now()
 
     def cbImage(self, image_msg):
         thread = threading.Thread(target=self.processImage, args=(image_msg,))
@@ -51,15 +50,16 @@ class Recog:
             	cv2.circle(image_cv, (x + w / 2, y + h / 2), 4, (255, 255, 255), -1)
             	font = cv2.FONT_HERSHEY_SIMPLEX
             	cv2.putText(image_cv, display_text, (x + w / 2, y + 3 * h / 4), font, 2, (255, 255, 255), 2)
-	if(display_text is "None"):
+	if(display_text is None):
 	    display_text = " "
         # Image processing stops here
-	if (display_text is not " " and time.time() - 2 >= self.the_time):
+	if (display_text is not " " and rospy.Time.now()- self.the_time  >= rospy.Duration(2,0)):
             self.pub_found.publish("Found {0}".format(display_text))
-            cv2.imwrite("{0}{1}.png".format(display_text, self.count), image_cv)
+            cv2.imwrite("~/racecar/challenge_photos/{0}{1}.png".format(display_text, self.count), image_cv)
 	    self.count += 1
-	    self.the_time = time.time()
-	    print(time.time()-1>self.the_time)
+	    print(rospy.Time.now()-self.the_time)
+	    print(rospy.Time.now(), self.the_time)
+	    self.the_time = rospy.Time.now()
         self.pub_image.publish(self.bridge.cv2_to_imgmsg(image_cv, "bgr8"))
 
         self.thread_lock.release()
@@ -198,7 +198,6 @@ class Recog:
                 the_one = largest_contours[i]
                 display_text = colors[i]
                 color_scheme = color_objects[i]
-                self.the_time = time.clock()
 	if (cv2.contourArea(the_one) < 10000):
 	    return None, None, None
 
