@@ -27,8 +27,8 @@ class Fieldnav:
         self.drivepub.publish(ackmsg)
 
     def capcharge(self, charge):
-	if charge < mincharge:
-	    return mincharge
+	if charge < self.mincharge:
+	    return self.mincharge
 	else:
 	    return charge
 
