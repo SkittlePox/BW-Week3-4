@@ -15,20 +15,20 @@ class Recog:
     def __init__(self):
         self.node_name = "Recog"
         self.thread_lock = threading.Lock()
-        self.sub_image = rospy.Subscriber("/camera/rgb/image_rect_color", Image, self.processImage, queue_size=1)
+        self.sub_image = rospy.Subscriber("/camera/rgb/image_rect_color", Image, self.cbImage, queue_size=1)
         self.pub_image = rospy.Publisher("/echo_image", Image, queue_size=1)
         self.pub_found = rospy.Publisher("/exploring_challenge", String, queue_size=1)
         self.bridge = CvBridge()
         self.the_time = time.clock()
 
     def cbImage(self, image_msg):
-        thread = threading.Thread(target=self.processImage, args=(image_msg))
+        thread = threading.Thread(target=self.processImage, args=(image_msg,))
         thread.setDaemon(True)
         thread.start()
 
     def processImage(self, image_msg):
-        #if not self.thread_lock.acquire(False):
-        #    return
+        if not self.thread_lock.acquire(False):
+            return
         image_cv = self.bridge.imgmsg_to_cv2(image_msg)
 
         # Image processing starts here
@@ -38,7 +38,7 @@ class Recog:
         if (face is not None):
             # Drawing rectangle for face
             display_text = self.faceClasify(face, image_cv)
-            cv2.rectangle(image, (face[0], face[1]), (face[0] + face[2], face[1] + face[3]), (0, 255, 0), 2)
+            cv2.rectangle(image_cv, (face[0], face[1]), (face[0] + face[2], face[1] + face[3]), (0, 255, 0), 2)
             font = cv2.FONT_HERSHEY_SIMPLEX
             cv2.putText(image_cv, display_text, (face[0] + face[0] / 2, face[1] + 3 * face[3] / 4), font, 4, (255, 255, 255), 2)
         else:
@@ -53,13 +53,13 @@ class Recog:
 
         print("Running")
         self.pub_found.publish("Found" + display_text)
-        self.pub_image.publish(self.bridge.cv2_to_imgmsg(image_cv))
+        self.pub_image.publish(self.bridge.cv2_to_imgmsg(image_cv, "bgr8"))
         #cv2.imwrite("~/racecar/challenge_photos/%s.png"%(display_text), image_cv)
 
-        #self.thread_lock.release()
+        self.thread_lock.release()
 
     def face_search(self, image_cv):
-        faceCascade = cv2.CascadeClassifier("haarcascade_frontalface_default[0]ml")
+        faceCascade = cv2.CascadeClassifier("haarcascade_frontalface_default.xml")
         gray = cv2.cvtColor(image_cv, cv2.COLOR_BGR2GRAY)
         faces = faceCascade.detectMultiScale(   # Finds faces
             gray,
@@ -90,7 +90,7 @@ class Recog:
 
         cv2.rectangle(image_cv, (x, y), (x + w, y + h), (0, 255, 0), 2)
 
-        image_crop = image[y:y+h, x:x+w]    # Just the face
+        image_crop = image_cv[y:y+h, x:x+w]    # Just the face
         image_hsv = cv2.cvtColor(image_crop, cv2.COLOR_BGR2HSV)
 
         filters_ari = [np.array([8, 110, 100]), np.array([12, 255, 225])]  # Ari
