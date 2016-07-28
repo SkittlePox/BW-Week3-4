@@ -19,7 +19,8 @@ class Recog:
         self.pub_image = rospy.Publisher("/echo_image", Image, queue_size=1)
         self.pub_found = rospy.Publisher("/exploring_challenge", String, queue_size=1)
         self.bridge = CvBridge()
-        self.the_time = time.clock()
+	self.count = 0
+        self.the_time = 0
 
     def cbImage(self, image_msg):
         thread = threading.Thread(target=self.processImage, args=(image_msg,))
@@ -50,11 +51,16 @@ class Recog:
             	cv2.circle(image_cv, (x + w / 2, y + h / 2), 4, (255, 255, 255), -1)
             	font = cv2.FONT_HERSHEY_SIMPLEX
             	cv2.putText(image_cv, display_text, (x + w / 2, y + 3 * h / 4), font, 2, (255, 255, 255), 2)
+	if(display_text is "None"):
+	    display_text = " "
         # Image processing stops here
-	if (display_text != " "):
+	if (display_text is not " " and time.time() - 2 >= self.the_time):
             self.pub_found.publish("Found {0}".format(display_text))
+            cv2.imwrite("{0}{1}.png".format(display_text, self.count), image_cv)
+	    self.count += 1
+	    self.the_time = time.time()
+	    print(time.time()-1>self.the_time)
         self.pub_image.publish(self.bridge.cv2_to_imgmsg(image_cv, "bgr8"))
-        #cv2.imwrite("~/racecar/challenge_photos/%s.png"%(display_text), image_cv)
 
         self.thread_lock.release()
 
@@ -130,7 +136,7 @@ class Recog:
         filters_red = [np.array([0, 165, 100]), np.array([6, 255, 255])]  # Red
         filters_red2 = [np.array([170, 165, 170]), np.array([180, 255, 255])]  # Red
         filters_green = [np.array([60, 100, 60]), np.array([88, 255, 255])]  # Green
-        filters_yellow = [np.array([24, 170, 114]), np.array([33, 255, 190])]  # Yellow
+        filters_yellow = [np.array([22, 150, 114]), np.array([33, 255, 190])]  # Yellow
         filters_blue = [np.array([106, 127, 51]), np.array([127, 255, 215])]  # Blue
 
         mask_red = cv2.inRange(image_hsv, filters_red[0], filters_red[1])
@@ -193,7 +199,7 @@ class Recog:
                 display_text = colors[i]
                 color_scheme = color_objects[i]
                 self.the_time = time.clock()
-	if (cv2.contourArea(the_one) < 20000):
+	if (cv2.contourArea(the_one) < 10000):
 	    return None, None, None
 
         return the_one, color_scheme, display_text
