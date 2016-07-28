@@ -32,9 +32,9 @@ class Recog:
         image_cv = self.bridge.imgmsg_to_cv2(image_msg)
 	display_text = " "
         # Image processing starts here
-        #face = self.face_search(image_cv)
+        face = self.face_search(image_cv)
 
-        if (False):#(face is not None):
+        if (face is not None):
             # Drawing rectangle for face
             display_text = self.faceClasify(face, image_cv)
             cv2.rectangle(image_cv, (face[0], face[1]), (face[0] + face[2], face[1] + face[3]), (0, 255, 0), 2)
@@ -60,7 +60,7 @@ class Recog:
 	    print(rospy.Time.now()-self.the_time)
 	    print(rospy.Time.now(), self.the_time)
 	    self.the_time = rospy.Time.now()
-        self.pub_image.publish(self.bridge.cv2_to_imgmsg(image_cv, "bgr8"))
+        #self.pub_image.publish(self.bridge.cv2_to_imgmsg(image_cv, "bgr8"))
 
         self.thread_lock.release()
 
