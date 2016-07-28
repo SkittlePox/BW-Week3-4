@@ -18,7 +18,7 @@ class Recog:
         self.thread_lock = threading.Lock()
         self.sub_image = rospy.Subscriber("/camera/rgb/image_rect_color", Image, self.cbImage, queue_size=1)
         self.pub_image = rospy.Publisher("~echo_image", Image, queue_size=1)
-        self.pub_found = rospy.Publisher("/exploring_challenge", std_msgs/String, queue_size=1)
+        self.pub_found = rospy.Publisher("/exploring_challenge", std_msgs / String, queue_size=1)
         self.bridge = CvBridge()
         self.the_time = time.clock()
 
@@ -34,14 +34,14 @@ class Recog:
 
         # Image processing starts here
         color_contour, color_scheme, display_text = self.color_search(image_cv)
-        faces = self.face_search(image_cv)
+        face = self.face_search(image_cv)
 
-        if (len(faces) > 0):
+        if (face is not None):
             # Drawing rectangle for face
-            cv2.rectangle(image, (faces[0].x, faces[0].y), (faces[0].x + faces[0].w, faces[0].y + faces[0].h), (0, 255, 0), 2)
-            display_text = "face"
+            display_text = self.faceClasify(face, image_cv)
+            cv2.rectangle(image, (face.x, face.y), (face.x + face.w, face.y + face.h), (0, 255, 0), 2)
             font = cv2.FONT_HERSHEY_SIMPLEX
-            cv2.putText(image_cv, display_text, (faces[0].x + faces[0].x / 2, faces[0].y + 3 * faces[0].h / 4), font, 4, (255, 255, 255), 2, cv2.LINE_AA)
+            cv2.putText(image_cv, display_text, (face.x + face.x / 2, face.y + 3 * face.h / 4), font, 4, (255, 255, 255), 2, cv2.LINE_AA)
         else:
             # Drawing contours
             cv2.drawContours(image_cv, [the_one], -1, (color_scheme.b, color_scheme.g, color_scheme.r))
@@ -52,7 +52,7 @@ class Recog:
             cv2.putText(image_cv, display_text, (x + x / 2, y + 3 * h / 4), font, 4, (255, 255, 255), 2, cv2.LINE_AA)
         # Image processing stops here
 
-        self.pub_found.publish("Found",display_text)
+        self.pub_found.publish("Found", display_text)
         self.pub_image.publish(self.bridge.cv2_to_imgmsg(image_cv, display_text))
         #cv2.imwrite("~/racecar/challenge_photos/%s.png"%(display_text), image_cv)
 
@@ -61,14 +61,68 @@ class Recog:
     def face_search(self, image_cv):
         faceCascade = cv2.CascadeClassifier("haarcascade_frontalface_default.xml")
         gray = cv2.cvtColor(image_cv, cv2.COLOR_BGR2GRAY)
-        faces = faceCascade.detectMultiScale(
+        faces = faceCascade.detectMultiScale(   # Finds faces
             gray,
             scaleFactor=1.1,
             minNeighbors=5,
             minSize=(30, 30),
             flags=cv2.CASCADE_SCALE_IMAGE
         )
-        return faces
+        if(len(faces) == 0):
+            return None
+
+        maxIndex = 0
+        index = 0
+        for (x, y, w, h) in faces:  # Finds largest face
+            if(h * w > faces[maxIndex].h * faces[maxIndex].w):
+                maxIndex = index
+            index += 1
+
+        the_face = faces[maxIndex]
+        return the_face
+
+    def faceClasify(self, the_face, image_cv):
+        x = the_face.x
+        y = the_face.y
+        w = the_face.w
+        h = the_face.h
+
+        cv2.rectangle(image_cv, (x, y), (x + w, y + h), (0, 255, 0), 2)
+
+        image_crop = image[y:y+h, x:x+w]    # Just the face
+        image_hsv = cv2.cvtColor(image_crop, cv2.COLOR_BGR2HSV)
+
+        filters_ari = [np.array([8, 110, 100]), np.array([12, 255, 225])]  # Ari
+        filters_sertac = [np.array([2, 0, 0]), np.array([9, 115, 255])]  # Sertac
+
+        mask_ari = cv2.inRange(image_hsv, filters_ari[0], filters_ari[1])
+        mask_sertac = cv2.inRange(image_hsv, filters_sertac[0], filters_sertac[1])
+
+        sertac_count = 0
+        ari_count = 0
+
+        for i in range(0, len(mask_sertac)):
+            for j in range(0, len(mask_sertac[i])):
+                if(mask_sertac[i][j] > 127):    # White pixel
+                    sertac_count += 1
+                else:
+                    sertac_count -= 1
+        #print(sertac_count)
+
+        for i in range(0, len(mask_ari)):
+            for j in range(0, len(mask_ari[i])):
+                if(mask_ari[i][j] > 127):    # White pixel
+                    ari_count += 1
+                else:
+                    ari_count -= 1
+        #print(ari_count)
+        who = ""
+        if(sertac_count > ari_count):
+            who = "sertac"
+        else:
+            who = "ari"
+
+        return who
 
     def color_search(self, image_cv):
         image_hsv = cv2.cvtColor(image_cv, cv2.COLOR_BGR2HSV)
@@ -103,7 +157,7 @@ class Recog:
         test_yellow = len(contours_yellow) > 0
         test_blue = len(contours_blue) > 0
 
-        if not (test_red or test_green or test_yellow or test_blue):    #TODO implement clock check with time.clock() - 5 > the_time, omitted for debugging purposes
+        if not (test_red or test_green or test_yellow or test_blue):  # TODO implement clock check with time.clock() - 5 > the_time, omitted for debugging purposes
             return
 
         contours = [contours_red, contours_green, contours_yellow, contours_blue]
