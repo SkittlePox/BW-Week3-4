@@ -24,7 +24,7 @@ class Recog:
         self.count = 0
 
         self.train_ari = cv2.imread("ari.jpg", 0)
-        self.train_sertac = cv2.imread("sertac.jpg", 0)
+        self.train_sertac = cv2.imread("sertac-blur.jpg", 0)
         self.orb = cv2.ORB()
         self.keypoints_ari, self.descriptors_ari = self.orb.detectAndCompute(self.train_ari, None)
         self.keypoints_sertac, self.descriptors_sertac = self.orb.detectAndCompute(self.train_sertac, None)
