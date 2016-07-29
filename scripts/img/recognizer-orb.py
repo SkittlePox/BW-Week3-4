@@ -23,12 +23,6 @@ class Recog:
 
         self.count = 0
 
-        self.train_ari = cv2.imread("ari.jpg", 0)
-        self.train_sertac = cv2.imread("sertac-blur.jpg", 0)
-        self.orb = cv2.ORB()
-        self.keypoints_ari, self.descriptors_ari = self.orb.detectAndCompute(self.train_ari, None)
-        self.keypoints_sertac, self.descriptors_sertac = self.orb.detectAndCompute(self.train_sertac, None)
-        self.bf = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True)
 
         self.the_time = rospy.Time.now()
 
@@ -70,15 +64,21 @@ class Recog:
         self.thread_lock.release()
 
     def image_classify(self, image_cv, contour):
+        train_ari = cv2.imread("ari.jpg", 0)
+        train_sertac = cv2.imread("sertac.jpg", 0)
+        orb = cv2.ORB()
+        keypoints_ari, descriptors_ari = orb.detectAndCompute(train_ari, None)
+        keypoints_sertac, descriptors_sertac = orb.detectAndCompute(train_sertac, None)
+        bf = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True)
         image_gray = cv2.cvtColor(image_cv, cv2.COLOR_BGR2GRAY)
-        #x, y, w, h = cv2.boundingRect(contour)
-        #image_gray = image_gray[y:y + h, x:x + w]
-        kps, dcs = self.orb.detectAndCompute(image_gray, None)
+        x, y, w, h = cv2.boundingRect(contour)
+        image_gray = image_gray[y:y + h, x:x + w]
+        kps, dcs = orb.detectAndCompute(image_gray, None)
 
-        matches_ari = self.bf.match(self.descriptors_ari, dcs)
-        matches_sertac = self.bf.match(self.descriptors_sertac, dcs)
+        matches_ari = bf.match(descriptors_ari, dcs)
+        matches_sertac = bf.match(descriptors_sertac, dcs)
 
-        print(matches_ari)
+        print(matches_sertac)
 
         matches_ari = sorted(matches_ari, key=lambda x: x.distance)
         matches_sertac = sorted(matches_sertac, key=lambda x: x.distance)
