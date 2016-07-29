@@ -79,13 +79,35 @@ class Recog:
         matches_ari = sorted(matches_ari, key=lambda x: x.distance)
         matches_sertac = sorted(matches_sertac, key=lambda x: x.distance)
 
+        if(len(matches_ari) == 0):
+            if(len(matches_sertac) is not 0):
+                return "sertac"
+            else:
+                return "idk1"
+        if(len(matches_sertac) == 0):
+            if(len(matches_ari) is not 0):
+                return "ari"
+            else:
+                return "idk2"
+
         avg_ari = 0
         avg_sertac = 0
-        for i in range(0, 10):
+        counter_a = 0
+        counter_s = 0
+        for i in range(0, len(matches_ari)):
             avg_ari += matches_ari[i].distance
+            counter_a += 1
+            if (counter_a == 9):
+                break
+
+        for i in range(0, len(matches_sertac)):
             avg_sertac += matches_sertac[i].distance
-        avg_ari /= 10
-        avg_sertac /= 10
+            counter_s += 1
+            if (counter_s == 9):
+                break
+
+        avg_ari /= counter_a
+        avg_sertac /= counter_s
 
         if(avg_ari < avg_sertac):
             return "ari"
