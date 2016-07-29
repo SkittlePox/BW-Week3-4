@@ -67,8 +67,14 @@ class Recog:
         train_ari = cv2.imread("ari.jpg", 0)
         train_sertac = cv2.imread("sertac.jpg", 0)
         orb = cv2.ORB()
-        keypoints_ari, descriptors_ari = orb.detectAndCompute(train_ari, None)
-        keypoints_sertac, descriptors_sertac = orb.detectAndCompute(train_sertac, None)
+        keypoints_ari = orb.detect(train_ari, None)
+        keypoints_sertac = orb.detect(train_sertac, None)
+        keypoints_ari, descriptors_ari = orb.compute(train_ari, keypoints_ari)
+        keypoints_sertac, descriptors_sertac = orb.compute(train_sertac, keypoints_sertac)
+
+        #keypoints_ari, descriptors_ari = orb.detectAndCompute(train_ari, None)
+        #keypoints_sertac, descriptors_sertac = orb.detectAndCompute(train_sertac, None)
+
         bf = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True)
         image_gray = cv2.cvtColor(image_cv, cv2.COLOR_BGR2GRAY)
         x, y, w, h = cv2.boundingRect(contour)
