@@ -25,10 +25,10 @@ class Recog:
 
         self.train_ari = cv2.imread("ari.jpg", 0)
         self.train_sertac = cv2.imread("sertac.jpg", 0)
-        self.keypoints_ari, elf.descriptors_ari = orb.detectAndCompute(self.train_ari, None)
-        self.keypoints_sertac, elf.descriptors_sertac = orb.detectAndCompute(self.train_sertac, None)
+        self.orb = cv2.ORB()
+        self.keypoints_ari, self.descriptors_ari = self.orb.detectAndCompute(self.train_ari, None)
+        self.keypoints_sertac, self.descriptors_sertac = self.orb.detectAndCompute(self.train_sertac, None)
         self.bf = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True)
-        self.orb = cv2.ORB_create()
 
         self.the_time = rospy.Time.now()
 
@@ -47,7 +47,7 @@ class Recog:
         the_one, color_scheme, display_text = self.color_search(image_cv)
         if not (the_one is None):  # If there is a blob
             if(display_text == "pink"):
-                display_text = image_classify(image_cv)
+                display_text = self.image_classify(image_cv)
             # Drawing contours
             cv2.drawContours(image_cv, [the_one], -1, (color_scheme.b, color_scheme.g, color_scheme.r))
             x, y, w, h = cv2.boundingRect(the_one)
@@ -71,7 +71,7 @@ class Recog:
 
     def image_classify(self, image_cv):
         image_gray = cv2.cvtColor(image_cv, cv2.COLOR_BGR2GRAY)
-        kps, dcs = orb.detectAndCompute(image_gray, None)
+        kps, dcs = self.orb.detectAndCompute(image_gray, None)
 
         matches_ari = self.bf.match(self.descriptors_ari, dcs)
         matches_sertac = self.bf.match(self.descriptors_sertac, dcs)
