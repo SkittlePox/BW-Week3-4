@@ -14,11 +14,22 @@ class Recog:
     def __init__(self):
         self.node_name = "Recog"
         self.thread_lock = threading.Lock()
+
         self.sub_image = rospy.Subscriber("/camera/rgb/image_rect_color", Image, self.cbImage, queue_size=1)
         self.pub_image = rospy.Publisher("/echo_image", Image, queue_size=1)
         self.pub_found = rospy.Publisher("/exploring_challenge", String, queue_size=1)
+
         self.bridge = CvBridge()
+
         self.count = 0
+
+        self.train_ari = cv2.imread("ari.jpg", 0)
+        self.train_sertac = cv2.imread("sertac.jpg", 0)
+        self.keypoints_ari, elf.descriptors_ari = orb.detectAndCompute(self.train_ari, None)
+        self.keypoints_sertac, elf.descriptors_sertac = orb.detectAndCompute(self.train_sertac, None)
+        self.bf = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True)
+        self.orb = cv2.ORB_create()
+
         self.the_time = rospy.Time.now()
 
     def cbImage(self, image_msg):
@@ -32,24 +43,18 @@ class Recog:
         image_cv = self.bridge.imgmsg_to_cv2(image_msg)
         display_text = " "
         # Image processing starts here
-        #face = self.face_search(image_cv)
 
-        if (False):
-            # Drawing rectangle for face
-            display_text = self.faceClasify(face, image_cv)
-            cv2.rectangle(image_cv, (face[0], face[1]), (face[0] + face[2], face[1] + face[3]), (0, 255, 0), 2)
+        the_one, color_scheme, display_text = self.color_search(image_cv)
+        if not (the_one is None):  # If there is a blob
+            if(display_text == "pink"):
+                display_text = image_classify(image_cv)
+            # Drawing contours
+            cv2.drawContours(image_cv, [the_one], -1, (color_scheme.b, color_scheme.g, color_scheme.r))
+            x, y, w, h = cv2.boundingRect(the_one)
+            cv2.rectangle(image_cv, (x, y), (x + w, y + h), (color_scheme.b, color_scheme.g, color_scheme.r, 2))
+            cv2.circle(image_cv, (x + w / 2, y + h / 2), 4, (255, 255, 255), -1)
             font = cv2.FONT_HERSHEY_SIMPLEX
-            cv2.putText(image_cv, display_text, (face[0] + face[0] / 2, face[1] + 3 * face[3] / 4), font, 4, (255, 255, 255), 2)
-        else:
-            the_one, color_scheme, display_text = self.color_search(image_cv)
-            if not (the_one is None):
-                # Drawing contours
-                cv2.drawContours(image_cv, [the_one], -1, (color_scheme.b, color_scheme.g, color_scheme.r))
-                x, y, w, h = cv2.boundingRect(the_one)
-                cv2.rectangle(image_cv, (x, y), (x + w, y + h), (color_scheme.b, color_scheme.g, color_scheme.r, 2))
-                cv2.circle(image_cv, (x + w / 2, y + h / 2), 4, (255, 255, 255), -1)
-                font = cv2.FONT_HERSHEY_SIMPLEX
-                cv2.putText(image_cv, display_text, (x + w / 2, y + 3 * h / 4), font, 2, (255, 255, 255), 2)
+            cv2.putText(image_cv, display_text, (x + w / 2, y + 3 * h / 4), font, 2, (255, 255, 255), 2)
         if(display_text is None):
             display_text = " "
         # Image processing stops here
@@ -64,51 +69,28 @@ class Recog:
 
         self.thread_lock.release()
 
-    #def face_search(self, image_cv):
+    def image_classify(self, image_cv):
+        image_gray = cv2.cvtColor(image_cv, cv2.COLOR_BGR2GRAY)
+        kps, dcs = orb.detectAndCompute(image_gray, None)
 
+        matches_ari = self.bf.match(descriptors_ari, dcs)
+        matches_sertac = self.bf.match(descriptors_sertac, dcs)
 
-    def faceClasify(self, the_face, image_cv):
-        x = the_face[0]
-        y = the_face[1]
-        w = the_face[2]
-        h = the_face[3]
+        matches_ari = sorted(matches_ari, key=lambda x: x.distance)
+        matches_sertac = sorted(matches_sertac, key=lambda x: x.distance)
 
-        cv2.rectangle(image_cv, (x, y), (x + w, y + h), (0, 255, 0), 2)
+        avg_ari = 0
+        avg_sertac = 0
+        for i in range(0, 10):
+            avg_ari += matches_ari[i].distance
+            avg_sertac += matches_sertac[i].distance
+        avg_ari /= 10
+        avg_sertac /= 10
 
-        image_crop = image_cv[y:y + h, x:x + w]    # Just the face
-        image_hsv = cv2.cvtColor(image_crop, cv2.COLOR_BGR2HSV)
-
-        filters_ari = [np.array([8, 110, 100]), np.array([12, 255, 225])]  # Ari
-        filters_sertac = [np.array([2, 0, 0]), np.array([9, 115, 255])]  # Sertac
-
-        mask_ari = cv2.inRange(image_hsv, filters_ari[0], filters_ari[1])
-        mask_sertac = cv2.inRange(image_hsv, filters_sertac[0], filters_sertac[1])
-
-        sertac_count = 0
-        ari_count = 0
-
-        for i in range(0, len(mask_sertac)):
-            for j in range(0, len(mask_sertac[i])):
-                if(mask_sertac[i][j] > 127):    # White pixel
-                    sertac_count += 1
-                else:
-                    sertac_count -= 1
-        # print(sertac_count)
-
-        for i in range(0, len(mask_ari)):
-            for j in range(0, len(mask_ari[i])):
-                if(mask_ari[i][j] > 127):    # White pixel
-                    ari_count += 1
-                else:
-                    ari_count -= 1
-        # print(ari_count)
-        who = ""
-        if(sertac_count > ari_count):
-            who = "sertac"
+        if(avg_ari < avg_sertac):
+            return "ari"
         else:
-            who = "ari"
-
-        return who
+            return "sertac"
 
     def color_search(self, image_cv):
         image_hsv = cv2.cvtColor(image_cv, cv2.COLOR_BGR2HSV)
@@ -171,10 +153,10 @@ class Recog:
                 for j in range(0, len(contours[i])):
                     if(cv2.contourArea(contours[i][j]) > cv2.contourArea(max_contour)):
                         max_contour = contours[i][j]
-		if(i == 4):	# Pink
-		    largest_areas.append(cv2.contourArea(max_contour)*1.5)
+                if(i == 4):  # Pink
+                    largest_areas.append(cv2.contourArea(max_contour) * 1.5)
                 else:
-		    largest_areas.append(cv2.contourArea(max_contour))  # Place the largest found contour's area in the largest_areas array
+                    largest_areas.append(cv2.contourArea(max_contour))  # Place the largest found contour's area in the largest_areas array
                 largest_contours.append(max_contour)                # Place the contour itself in the largest_contours array
             else:   # If no contours exist for a given mask populated it with empty values
                 largest_areas.append(0)
