@@ -78,7 +78,7 @@ class Recog:
         matches_ari = bf.match(descriptors_ari, dcs)
         matches_sertac = bf.match(descriptors_sertac, dcs)
 
-        print(keypoints_sertac)
+        print(len(keypoints_sertac))
         print(matches_sertac)
 
         matches_ari = sorted(matches_ari, key=lambda x: x.distance)
