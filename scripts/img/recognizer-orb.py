@@ -73,8 +73,8 @@ class Recog:
         image_gray = cv2.cvtColor(image_cv, cv2.COLOR_BGR2GRAY)
         kps, dcs = orb.detectAndCompute(image_gray, None)
 
-        matches_ari = self.bf.match(descriptors_ari, dcs)
-        matches_sertac = self.bf.match(descriptors_sertac, dcs)
+        matches_ari = self.bf.match(self.descriptors_ari, dcs)
+        matches_sertac = self.bf.match(self.descriptors_sertac, dcs)
 
         matches_ari = sorted(matches_ari, key=lambda x: x.distance)
         matches_sertac = sorted(matches_sertac, key=lambda x: x.distance)
