@@ -55,16 +55,16 @@ class Recog:
         # Image processing stops here
         if (display_text is not " " and rospy.Time.now() - self.the_time >= rospy.Duration(2, 0)):
             self.pub_found.publish("Found {0}".format(display_text))
-            cv2.imwrite("/home/racecar/challenge_photos/{0}{1}.png".format(display_text, self.count), image_cv)
+            #cv2.imwrite("/home/racecar/challenge_photos/{0}{1}.png".format(display_text, self.count), image_cv)
             self.count += 1
             print(rospy.Time.now() - self.the_time)
             print(rospy.Time.now(), self.the_time)
             self.the_time = rospy.Time.now()
-        #self.pub_image.publish(self.bridge.cv2_to_imgmsg(image_cv, "bgr8"))
+        self.pub_image.publish(self.bridge.cv2_to_imgmsg(image_cv, "bgr8"))
 
         self.thread_lock.release()
 
-    def face_search(self, image_cv):
+    #def face_search(self, image_cv):
 
 
     def faceClasify(self, the_face, image_cv):
@@ -154,7 +154,7 @@ class Recog:
         contours = [contours_red, contours_green, contours_yellow, contours_blue, contours_pink]
         tests = [test_red, test_green, test_yellow, test_blue, test_pink]
         colors = ["red", "green", "yellow", "blue", "pink"]
-        color_objects = [std_msgs.msg.ColorRGBA(255.0, 0.0, 0.0, 0.0), std_msgs.msg.ColorRGBA(0.0, 255.0, 0.0, 0.0), std_msgs.msg.ColorRGBA(0.0, 255.0, 255.0, 0.0), std_msgs.msg.ColorRGBA(0.0, 0.0, 255.0, 0.0), std_msgs.msg.ColorRGBA(255.0, 0.0, 255.0, 0.0)]
+        color_objects = [std_msgs.msg.ColorRGBA(255.0, 0.0, 0.0, 0.0), std_msgs.msg.ColorRGBA(0.0, 255.0, 0.0, 0.0), std_msgs.msg.ColorRGBA(255.0, 255.0, 0.0, 0.0), std_msgs.msg.ColorRGBA(0.0, 0.0, 255.0, 0.0), std_msgs.msg.ColorRGBA(255.0, 0.0, 255.0, 0.0)]
 
         # Populated Later
         largest_areas = []
@@ -171,7 +171,10 @@ class Recog:
                 for j in range(0, len(contours[i])):
                     if(cv2.contourArea(contours[i][j]) > cv2.contourArea(max_contour)):
                         max_contour = contours[i][j]
-                largest_areas.append(cv2.contourArea(max_contour))  # Place the largest found contour's area in the largest_areas array
+		if(i == 4):	# Pink
+		    largest_areas.append(cv2.contourArea(max_contour)*1.5)
+                else:
+		    largest_areas.append(cv2.contourArea(max_contour))  # Place the largest found contour's area in the largest_areas array
                 largest_contours.append(max_contour)                # Place the contour itself in the largest_contours array
             else:   # If no contours exist for a given mask populated it with empty values
                 largest_areas.append(0)
@@ -183,7 +186,7 @@ class Recog:
                 the_one = largest_contours[i]
                 display_text = colors[i]
                 color_scheme = color_objects[i]
-        if (cv2.contourArea(the_one) < 7000):
+        if (largest < 7000):
             return None, None, None
 
         return the_one, color_scheme, display_text
