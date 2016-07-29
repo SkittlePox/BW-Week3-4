@@ -69,10 +69,10 @@ class Recog:
 
         self.thread_lock.release()
 
-    def image_classify(self, image_cv):
+    def image_classify(self, image_cv, contour):
         image_gray = cv2.cvtColor(image_cv, cv2.COLOR_BGR2GRAY)
-        x, y, w, h = cv2.boundingRect(the_one)
-        image_gray = image_cv[y:y + h, x:x + w]
+        x, y, w, h = cv2.boundingRect(contour)
+        image_gray = image_gray[y:y + h, x:x + w]
         kps, dcs = self.orb.detectAndCompute(image_gray, None)
 
         matches_ari = self.bf.match(self.descriptors_ari, dcs)
