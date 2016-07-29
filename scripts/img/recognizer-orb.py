@@ -46,11 +46,11 @@ class Recog:
 
         the_one, color_scheme, display_text = self.color_search(image_cv)
         if not (the_one is None):  # If there is a blob
-            if(display_text == "pink"):
-                display_text = self.image_classify(image_cv)
             # Drawing contours
             cv2.drawContours(image_cv, [the_one], -1, (color_scheme.b, color_scheme.g, color_scheme.r))
             x, y, w, h = cv2.boundingRect(the_one)
+            if(display_text == "pink"):
+                display_text = self.image_classify(image_cv, the_one)
             cv2.rectangle(image_cv, (x, y), (x + w, y + h), (color_scheme.b, color_scheme.g, color_scheme.r, 2))
             cv2.circle(image_cv, (x + w / 2, y + h / 2), 4, (255, 255, 255), -1)
             font = cv2.FONT_HERSHEY_SIMPLEX
@@ -71,6 +71,8 @@ class Recog:
 
     def image_classify(self, image_cv):
         image_gray = cv2.cvtColor(image_cv, cv2.COLOR_BGR2GRAY)
+        x, y, w, h = cv2.boundingRect(the_one)
+        image_gray = image_cv[y:y + h, x:x + w]
         kps, dcs = self.orb.detectAndCompute(image_gray, None)
 
         matches_ari = self.bf.match(self.descriptors_ari, dcs)
