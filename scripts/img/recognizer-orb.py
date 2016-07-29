@@ -72,8 +72,8 @@ class Recog:
 
         bf = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True)
         image_gray = cv2.cvtColor(image_cv, cv2.COLOR_BGR2GRAY)
-        x, y, w, h = cv2.boundingRect(contour)
-        image_gray = image_gray[y:y + h, x:x + w]
+        #x, y, w, h = cv2.boundingRect(contour)
+        #image_gray = image_gray[y:y + h, x:x + w]
         kps, dcs = orb.detectAndCompute(image_gray, None)
 
         matches_sertac = bf.match(descriptors_sertac, dcs)
