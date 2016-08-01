@@ -101,7 +101,7 @@ class Recog:
             for j in range(0, len(matches[i])):
                 avgs[i] += matches[i][j].distance
                 counters[i] += 1
-                if(counters[i] == 9):
+                if(counters[i] == 20):
                     avgs[i] /= counters[i]
                     break
             if(len(matches[i]) == 0):
