@@ -64,9 +64,13 @@ class Recog:
 
     def image_classify(self, image_cv, contour):
         train_ari= cv2.imread('/home/racecar/racecar-ws/src/come_on_and_SLAM/scripts/img/ari.jpg', 0)
+        train_car= cv2.imread('/home/racecar/racecar-ws/src/come_on_and_SLAM/scripts/img/car.png', 0)
+        train_cat= cv2.imread('/home/racecar/racecar-ws/src/come_on_and_SLAM/scripts/img/cat.png', 0)
         train_sertac = cv2.imread('/home/racecar/racecar-ws/src/come_on_and_SLAM/scripts/img/sertac.jpg', 0)
         orb = cv2.ORB()
         keypoints_ari, descriptors_ari = orb.detectAndCompute(train_ari, None)
+        keypoints_car, descriptors_car = orb.detectAndCompute(train_car, None)
+        keypoints_cat, descriptors_cat = orb.detectAndCompute(train_cat, None)
         keypoints_sertac, descriptors_sertac = orb.detectAndCompute(train_sertac, None)
 
         bf = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True)
@@ -74,16 +78,44 @@ class Recog:
         x, y, w, h = cv2.boundingRect(contour)
         image_gray = image_gray[y:y + h, x:x + w]
         kps, dcs = orb.detectAndCompute(image_gray, None)
-
-	try:
+        try:
             matches_sertac = bf.match(descriptors_sertac, dcs)
             matches_ari = bf.match(descriptors_ari, dcs)
-	except:
-	    return " "
+            matches_car = bf.match(descriptors_car, dcs)
+            matches_cat = bf.match(descriptors_cat, dcs)
+        except:
+            return " "
         #print(matches_sertac)
 
         matches_ari = sorted(matches_ari, key=lambda x: x.distance)
         matches_sertac = sorted(matches_sertac, key=lambda x: x.distance)
+        matches_car = sorted(matches_car, key=lambda x: x.distance)
+        matches_cat = sorted(matches_cat, key=lambda x: x.distance)
+
+        matches = [matches_ari, matches_sertac, matches_cat, matches_car]
+        avgs = [0,0,0,0]   # ari, sertac, cat, car
+        counters = [0,0,0,0]
+        objs = ["ari", "sertac", "cat", "racecar"]
+
+        for i in range(0, len(matches)):
+            for j in range(0, len(matches[i])):
+                avgs[i] += matches[i][j].distance
+                counters[i] += 1
+                if(counters[i] == 9):
+                    avgs[i] /= counters[i]
+                    break
+            if(len(matches[i]) == 0):
+                avgs[i] = 1000000000
+        minval = min(avgs)
+        for i in range(0, len(matches)):
+            if(avgs[i] == minval):
+                return objs[i]
+
+        # Comment out when passed
+        calc_ari = len(matches_ari) != 0
+        calc_sertac = len(matches_sertac) != 0
+        calc_car = len(matches_car) != 0
+        calc_cat = len(matches_cat) != 0
 
         if(len(matches_ari) == 0):
             if(len(matches_sertac) is not 0):
