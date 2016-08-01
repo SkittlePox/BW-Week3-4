@@ -23,7 +23,6 @@ class Recog:
 
         self.count = 0
 
-
         self.the_time = rospy.Time.now()
 
     def cbImage(self, image_msg):
@@ -56,38 +55,32 @@ class Recog:
             self.pub_found.publish("Found {0}".format(display_text))
             #cv2.imwrite("/home/racecar/challenge_photos/{0}{1}.png".format(display_text, self.count), image_cv)
             self.count += 1
-            print(rospy.Time.now() - self.the_time)
-            print(rospy.Time.now(), self.the_time)
+            #print(rospy.Time.now() - self.the_time)
+            #print(rospy.Time.now(), self.the_time)
             self.the_time = rospy.Time.now()
         self.pub_image.publish(self.bridge.cv2_to_imgmsg(image_cv, "bgr8"))
 
         self.thread_lock.release()
 
     def image_classify(self, image_cv, contour):
-        #train_ari = cv2.imread("ari.jpg", 0)
-        train_sertac = cv2.imread("sertac.jpg", 0)
+        train_ari= cv2.imread('/home/racecar/racecar-ws/src/come_on_and_SLAM/scripts/img/ari.jpg', 0)
+        train_sertac = cv2.imread('/home/racecar/racecar-ws/src/come_on_and_SLAM/scripts/img/sertac.jpg', 0)
         orb = cv2.ORB()
-        #keypoints_ari, descriptors_ari = orb.detectAndCompute(train_ari, None)
+        keypoints_ari, descriptors_ari = orb.detectAndCompute(train_ari, None)
         keypoints_sertac, descriptors_sertac = orb.detectAndCompute(train_sertac, None)
 
         bf = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True)
         image_gray = cv2.cvtColor(image_cv, cv2.COLOR_BGR2GRAY)
-        #x, y, w, h = cv2.boundingRect(contour)
-        #image_gray = image_gray[y:y + h, x:x + w]
+        x, y, w, h = cv2.boundingRect(contour)
+        image_gray = image_gray[y:y + h, x:x + w]
         kps, dcs = orb.detectAndCompute(image_gray, None)
 
         matches_sertac = bf.match(descriptors_sertac, dcs)
-        #matches_ari = bf.match(descriptors_ari, dcs)
-
+        matches_ari = bf.match(descriptors_ari, dcs)
         print(matches_sertac)
 
-        #matches_ari = sorted(matches_ari, key=lambda x: x.distance)
+        matches_ari = sorted(matches_ari, key=lambda x: x.distance)
         matches_sertac = sorted(matches_sertac, key=lambda x: x.distance)
-
-        if(len(matches_sertac) is not 0):
-            return "sertac"
-        else:
-            return "idk3"
 
         if(len(matches_ari) == 0):
             if(len(matches_sertac) is not 0):
