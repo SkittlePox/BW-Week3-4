@@ -36,7 +36,7 @@ class Fieldexplore:
 	    return charge
 
     def capspeed(self, speed):
-	print speed
+#	print speed
         if speed > self.maxspeed:
 	    if self.maxspeed-self.lastspeed>self.maxderiv and self.lastspeed > .4:
 #		print self.lastspeed+self.maxderiv
@@ -61,7 +61,7 @@ class Fieldexplore:
 	vy=0.0;
 
 	valscale = .0006
-	steercoeff = -6
+	steercoeff = -10
 	vmin = .25
 #	stoprange=.4
 #	backspeed=-.5
@@ -94,8 +94,8 @@ class Fieldexplore:
 #	    vxo=0
 #	    vyo=backspeed
 	vyo = self.capspeed(vyo)
-	print vyo
-	print vyo - self.lastspeed
+#	print vyo
+#	print vyo - self.lastspeed
 	self.lastspeed = vyo
 
 	self.drive(vxo, vyo)
