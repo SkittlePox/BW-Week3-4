@@ -20,6 +20,8 @@ class Recog:
         self.pub_found = rospy.Publisher("/exploring_challenge", String, queue_size=1)
 
         self.bridge = CvBridge()
+        self.train_ari= cv2.imread('/home/racecar/racecar-ws/src/come_on_and_SLAM/scripts/img/ari.jpg', 0)
+        self.train_sertac = cv2.imread('/home/racecar/racecar-ws/src/come_on_and_SLAM/scripts/img/sertac.jpg', 0)
 
         self.count = 0
 
@@ -63,11 +65,9 @@ class Recog:
         self.thread_lock.release()
 
     def image_classify(self, image_cv, contour):
-        train_ari= cv2.imread('/home/racecar/racecar-ws/src/come_on_and_SLAM/scripts/img/ari.jpg', 0)
-        train_sertac = cv2.imread('/home/racecar/racecar-ws/src/come_on_and_SLAM/scripts/img/sertac.jpg', 0)
         orb = cv2.ORB()
-        keypoints_ari, descriptors_ari = orb.detectAndCompute(train_ari, None)
-        keypoints_sertac, descriptors_sertac = orb.detectAndCompute(train_sertac, None)
+        keypoints_ari, descriptors_ari = orb.detectAndCompute(self.train_ari, None)
+        keypoints_sertac, descriptors_sertac = orb.detectAndCompute(self.train_sertac, None)
 
         bf = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True)
         image_gray = cv2.cvtColor(image_cv, cv2.COLOR_BGR2GRAY)
