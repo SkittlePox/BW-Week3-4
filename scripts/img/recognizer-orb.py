@@ -12,7 +12,7 @@ import threading
 class Recog:
 
     def __init__(self):
-        self.node_name = "Recog"
+        self.node_name = "RecognizerORB"
         self.thread_lock = threading.Lock()
 
         self.sub_image = rospy.Subscriber("/camera/rgb/image_rect_color", Image, self.cbImage, queue_size=1)
@@ -233,6 +233,6 @@ class Recog:
         return the_one, color_scheme, display_text
 
 if __name__ == "__main__":
-    rospy.init_node('Recog')
+    rospy.init_node('RecognizerORB')
     main = Recog()
     rospy.spin()
