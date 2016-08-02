@@ -11,7 +11,7 @@ from sensor_msgs.msg import LaserScan # laser scanner msgs; Joy may be unnecessa
 class Fieldexplore:
 
     def __init__(self):
-	rospy.init_node("Fieldexplore")
+	rospy.init_node("FieldExplore")
 	rospy.Subscriber('scan', LaserScan, self.parsescan)
 	self.drivepub = rospy.Publisher('/vesc/ackermann_cmd_mux/input/navigation', AckermannDriveStamped, queue_size=1)
 	self.maxspeed = .8
@@ -19,7 +19,7 @@ class Fieldexplore:
 	self.mincharge=-.1
 
 	self.maxderiv = .0001
-	self.lastspeed = 0		
+	self.lastspeed = 0
 
     def drive(self, angle, speed):
 
@@ -41,7 +41,7 @@ class Fieldexplore:
 	    if self.maxspeed-self.lastspeed>self.maxderiv and self.lastspeed > .4:
 		return self.lastspeed+self.maxderiv
             return self.maxspeed
-	    
+
         elif -speed > self.maxspeed:
 	    return -self.maxspeed
 	elif speed - self.lastspeed > self.maxderiv:
@@ -66,7 +66,7 @@ class Fieldexplore:
 	for i in range(180,900):
 	    vx-=self.coordconvert(scan.ranges[i], i)[0]
 	    vy-=self.coordconvert(scan.ranges[i], i)[1]
-	
+
 	vx*=valscale
 	vy*=valscale
 
@@ -76,9 +76,9 @@ class Fieldexplore:
 	vyo = vy+self.backcharge
 	vxo = steercoeff*math.atan2(vx, vyo)
 
-	
+
 	if vyo<vmin and -3<vyo:
-	    self.backcharge-=.1 
+	    self.backcharge-=.1
 	    vyo=vy+self.capcharge(self.backcharge)
 	    vxo*=-1
 #	    print "backminus: "+str(self.backcharge)
@@ -97,6 +97,6 @@ class Fieldexplore:
 
 
 if __name__ == '__main__':
-
+    rospy.init_node("FieldExplore")
     node = Fieldexplore()
     rospy.spin()
