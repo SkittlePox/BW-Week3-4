@@ -49,8 +49,8 @@ class Recog:
         # Image processing starts here
 
         the_one, color_scheme, display_text = self.color_search(image_cv)
-        shape = plus_test(the_one)
         if not (the_one is None):  # If there is a blob
+            shape = self.plus_test(the_one)
             # Drawing contours
             cv2.drawContours(image_cv, [the_one], -1, (color_scheme.b, color_scheme.g, color_scheme.r))
             x, y, w, h = cv2.boundingRect(the_one)
@@ -74,9 +74,14 @@ class Recog:
 
         self.thread_lock.release()
 
-    def plus_test(self, contour):
-        if(cv2.matchShapes(the_one, plusCT, 1, 0.0) < 0.2):
-            return " plus"
+    def plus_test(self, the_one):
+        try:
+            ret = cv2.matchShapes(the_one, self.plusCT, 1, 0.0)
+            print(ret)
+            if(ret < 0.1):
+                return " plus"
+        except:
+            " noooo"
         return None
 
     def image_classify(self, image_cv, contour):
@@ -177,7 +182,7 @@ class Recog:
         filters_red2 = [np.array([170, 165, 170]), np.array([180, 255, 255])]  # Red
         filters_green = [np.array([60, 100, 100]), np.array([88, 255, 255])]  # Green
         filters_yellow = [np.array([22, 150, 114]), np.array([33, 255, 190])]  # Yellow
-        filters_blue = [np.array([106, 127, 51]), np.array([127, 255, 215])]  # Blue
+        filters_blue = [np.array([106, 127, 70]), np.array([127, 235, 215])]  # Blue
         filters_pink = [np.array([144, 91, 146]), np.array([165, 145, 255])]  # Pink
 
         mask_red = cv2.inRange(image_hsv, filters_red[0], filters_red[1])
