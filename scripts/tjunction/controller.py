@@ -73,7 +73,7 @@ class Control:
             )
             if msg.area > self.area_des:
                 self.state = STATE_NUDGE
-                #self.nudge_iteration = 2 if msg.target == 1 else 0
+                self.nudge_iteration = 0 if msg.target == 1 else 0
                 self.direction = 'right' if msg.target == 1 else 'left'
                 self.nudge_timer = rospy.Timer(rospy.Duration(.2), self.nudge_callback)
 
