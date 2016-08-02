@@ -38,12 +38,15 @@ class Recog:
         # Image processing starts here
 
         the_one, color_scheme, display_text = self.color_search(image_cv)
+        shape = plus_test(the_one)
         if not (the_one is None):  # If there is a blob
             # Drawing contours
             cv2.drawContours(image_cv, [the_one], -1, (color_scheme.b, color_scheme.g, color_scheme.r))
             x, y, w, h = cv2.boundingRect(the_one)
             if(display_text == "pink"):
                 display_text = self.image_classify(image_cv, the_one)
+            elif(shape is not None):
+                display_text += shape
             cv2.rectangle(image_cv, (x, y), (x + w, y + h), (color_scheme.b, color_scheme.g, color_scheme.r, 2))
             cv2.circle(image_cv, (x + w / 2, y + h / 2), 4, (255, 255, 255), -1)
             font = cv2.FONT_HERSHEY_SIMPLEX
@@ -59,6 +62,22 @@ class Recog:
         self.pub_image.publish(self.bridge.cv2_to_imgmsg(image_cv, "bgr8"))
 
         self.thread_lock.release()
+
+    def plus_test(self, contour):
+        filters_green = [np.array([60, 100, 100]), np.array([88, 255, 255])]  # Green
+
+        plus = cv2.imread("plus.png", 0)
+        _,plus_binary = cv2.threshold(plus,127,255,cv2.THRESH_BINARY_INV)
+        contours_plus = cv2.findContours(plus_binary, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)[0]
+
+        if(len(contours_plus) != 0):
+            index = 0
+            for i in range(0, len(contours_plus)):
+                if(cv2.contourArea(contours_plus[i]) > cv2.contourArea(contours_plus[index])):
+                    index = i
+            if(cv2.matchShapes(the_one, contours_plus[index], 1, 0.0) < 0.2):
+                return " plus"
+        return None
 
     def image_classify(self, image_cv, contour):
         train_ari= cv2.imread('/home/racecar/racecar-ws/src/come_on_and_SLAM/scripts/img/ari.jpg', 0)
@@ -156,7 +175,7 @@ class Recog:
 
         filters_red = [np.array([0, 165, 100]), np.array([6, 255, 255])]  # Red
         filters_red2 = [np.array([170, 165, 170]), np.array([180, 255, 255])]  # Red
-        filters_green = [np.array([60, 100, 60]), np.array([88, 255, 255])]  # Green
+        filters_green = [np.array([60, 100, 100]), np.array([88, 255, 255])]  # Green
         filters_yellow = [np.array([22, 150, 114]), np.array([33, 255, 190])]  # Yellow
         filters_blue = [np.array([106, 127, 51]), np.array([127, 255, 215])]  # Blue
         filters_pink = [np.array([144, 91, 146]), np.array([165, 145, 255])]  # Pink
