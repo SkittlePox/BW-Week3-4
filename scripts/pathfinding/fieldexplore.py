@@ -94,8 +94,8 @@ class Fieldexplore:
 #	    vxo=0
 #	    vyo=backspeed
 	vyo = self.capspeed(vyo)
-#	print vyo
-#	print vyo - self.lastspeed
+	print vyo
+	print vyo - self.lastspeed
 	self.lastspeed = vyo
 
 	self.drive(vxo, vyo)
