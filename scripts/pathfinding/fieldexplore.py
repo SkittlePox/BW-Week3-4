@@ -38,7 +38,7 @@ class Fieldexplore:
     def capspeed(self, speed):
 #	print speed
         if speed > self.maxspeed:
-	    if self.maxspeed-self.lastspeed>self.maxderiv and self.lastspeed > .4:
+	    if self.maxspeed-self.lastspeed>self.maxderiv and self.lastspeed > .5:
 		return self.lastspeed+self.maxderiv
             return self.maxspeed
 
