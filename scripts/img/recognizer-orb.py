@@ -53,10 +53,8 @@ class Recog:
         # Image processing stops here
         if (display_text is not " " and rospy.Time.now() - self.the_time >= rospy.Duration(2, 0)):
             self.pub_found.publish("Found {0}".format(display_text))
-            #cv2.imwrite("/home/racecar/challenge_photos/{0}{1}.png".format(display_text, self.count), image_cv)
+            cv2.imwrite("/home/racecar/challenge_photos/{0}{1}.png".format(display_text, self.count), image_cv)
             self.count += 1
-            #print(rospy.Time.now() - self.the_time)
-            #print(rospy.Time.now(), self.the_time)
             self.the_time = rospy.Time.now()
         self.pub_image.publish(self.bridge.cv2_to_imgmsg(image_cv, "bgr8"))
 
@@ -101,8 +99,9 @@ class Recog:
             for j in range(0, len(matches[i])):
                 avgs[i] += matches[i][j].distance
                 counters[i] += 1
-                if(counters[i] == 20):
+                if(counters[i] == 9):
                     avgs[i] /= counters[i]
+		    avgs[i] /= (10-counters[i])
                     break
             if(len(matches[i]) == 0):
                 avgs[i] = 1000000000
