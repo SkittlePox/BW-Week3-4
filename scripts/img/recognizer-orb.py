@@ -42,6 +42,12 @@ class Recog:
         thread.start()
 
     def processImage(self, image_msg):
+        try:
+            self._processImage(image_msg)
+        except:
+            print("Oh no!")
+
+    def _processImage(self, image_msg):
         if not self.thread_lock.acquire(False):
             return
         image_cv = self.bridge.imgmsg_to_cv2(image_msg)
