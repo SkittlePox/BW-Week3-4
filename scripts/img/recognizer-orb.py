@@ -2,7 +2,7 @@
 import cv2
 import rospy
 import numpy as np
-from sensor_msgs.msg import Image
+from sensor_msgs.msg import Image, CompressedImage
 from std_msgs.msg import *
 from cv_bridge import CvBridge, CvBridgeError
 from geometry_msgs.msg import Point
@@ -18,13 +18,14 @@ class Recog:
         self.sub_image = rospy.Subscriber("/camera/rgb/image_rect_color", Image, self.cbImage, queue_size=1)
         self.pub_image = rospy.Publisher("/echo_image", Image, queue_size=1)
         self.pub_found = rospy.Publisher("/exploring_challenge", String, queue_size=1)
+        self.pub_image_comp = rospy.Publisher("~echo_image/compressed", CompressedImage, queue_size=1)
 
         self.bridge = CvBridge()
 
         self.count = 0
 
         plus = cv2.imread("plus.png", 0)
-        _,plus_binary = cv2.threshold(plus,127,255,cv2.THRESH_BINARY_INV)
+        _, plus_binary = cv2.threshold(plus, 127, 255, cv2.THRESH_BINARY_INV)
         contours_plus = cv2.findContours(plus_binary, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)[0]
 
         if(len(contours_plus) != 0):
@@ -42,6 +43,12 @@ class Recog:
         thread.start()
 
     def processImage(self, image_msg):
+        try:
+            self._processImage(image_msg)
+        except:
+            print("Oh no!")
+
+    def _processImage(self, image_msg):
         if not self.thread_lock.acquire(False):
             return
         image_cv = self.bridge.imgmsg_to_cv2(image_msg)
@@ -70,6 +77,14 @@ class Recog:
             cv2.imwrite("/home/racecar/challenge_photos/{0}{1}.png".format(display_text, self.count), image_cv)
             self.count += 1
             self.the_time = rospy.Time.now()
+
+        # Compressing image to publish
+        msg = CompressedImage()
+        msg.format = "jpeg"
+        msg.data = np.array(cv2.imencode('.jpg', image_cv)[1]).tostring()
+        self.pub_image_comp.publish(msg)
+
+        # Publishing uncompressed image
         self.pub_image.publish(self.bridge.cv2_to_imgmsg(image_cv, "bgr8"))
 
         self.thread_lock.release()
@@ -85,9 +100,9 @@ class Recog:
         return None
 
     def image_classify(self, image_cv, contour):
-        train_ari= cv2.imread('/home/racecar/racecar-ws/src/come_on_and_SLAM/scripts/img/ari.jpg', 0)
-        train_car= cv2.imread('/home/racecar/racecar-ws/src/come_on_and_SLAM/scripts/img/car.png', 0)
-        train_cat= cv2.imread('/home/racecar/racecar-ws/src/come_on_and_SLAM/scripts/img/cat.png', 0)
+        train_ari = cv2.imread('/home/racecar/racecar-ws/src/come_on_and_SLAM/scripts/img/ari.jpg', 0)
+        train_car = cv2.imread('/home/racecar/racecar-ws/src/come_on_and_SLAM/scripts/img/car.png', 0)
+        train_cat = cv2.imread('/home/racecar/racecar-ws/src/come_on_and_SLAM/scripts/img/cat.png', 0)
         train_sertac = cv2.imread('/home/racecar/racecar-ws/src/come_on_and_SLAM/scripts/img/sertac.jpg', 0)
         orb = cv2.ORB()
         keypoints_ari, descriptors_ari = orb.detectAndCompute(train_ari, None)
@@ -107,7 +122,7 @@ class Recog:
             matches_cat = bf.match(descriptors_cat, dcs)
         except:
             return " "
-        #print(matches_sertac)
+        # print(matches_sertac)
 
         matches_ari = sorted(matches_ari, key=lambda x: x.distance)
         matches_sertac = sorted(matches_sertac, key=lambda x: x.distance)
@@ -115,8 +130,8 @@ class Recog:
         matches_cat = sorted(matches_cat, key=lambda x: x.distance)
 
         matches = [matches_ari, matches_sertac, matches_cat, matches_car]
-        avgs = [0,0,0,0]   # ari, sertac, cat, car
-        counters = [0,0,0,0]
+        avgs = [0, 0, 0, 0]   # ari, sertac, cat, car
+        counters = [0, 0, 0, 0]
         objs = ["ari", "sertac", "cat", "racecar"]
 
         for i in range(0, len(matches)):
@@ -125,7 +140,7 @@ class Recog:
                 counters[i] += 1
                 if(counters[i] == 9):
                     avgs[i] /= counters[i]
-		    avgs[i] /= (10-counters[i])
+                    avgs[i] /= (10 - counters[i])
                     break
             if(len(matches[i]) == 0):
                 avgs[i] = 1000000000
