@@ -1,10 +1,10 @@
 <?xml version="1.0"?>
 <package>
-  <name>come_on_and_SLAM</name>
+  <name>racecar_66</name>
   <version>0.0.0</version>
-  <description>The come_on_and_SLAM package</description>
+  <description>The beaverworks-77 package</description>
 
-  <!-- One maintainer tag required, multiple allowed, one person per tag --> 
+  <!-- One maintainer tag required, multiple allowed, one person per tag -->
   <!-- Example:  -->
   <!-- <maintainer email="jane.doe@example.com">Jane Doe</maintainer> -->
   <maintainer email="racecar@todo.todo">racecar</maintainer>
@@ -19,7 +19,7 @@
   <!-- Url tags are optional, but mutiple are allowed, one per tag -->
   <!-- Optional attribute type can be: website, bugtracker, or repository -->
   <!-- Example: -->
-  <!-- <url type="website">http://wiki.ros.org/come_on_and_SLAM</url> -->
+  <!-- <url type="website">http://wiki.ros.org/beaverworks-77</url> -->
 
 
   <!-- Author tags are optional, mutiple are allowed, one per tag -->
@@ -40,7 +40,8 @@
   <!-- Use test_depend for packages you need only for testing: -->
   <!--   <test_depend>gtest</test_depend> -->
   <buildtool_depend>catkin</buildtool_depend>
-
+  <build_depend>message_generation</build_depend>
+  <run_depend>message_runtime</run_depend>
 
   <!-- The export tag contains other, unspecified, tags -->
   <export>
