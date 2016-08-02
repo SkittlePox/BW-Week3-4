@@ -23,6 +23,17 @@ class Recog:
 
         self.count = 0
 
+        plus = cv2.imread("plus.png", 0)
+        _,plus_binary = cv2.threshold(plus,127,255,cv2.THRESH_BINARY_INV)
+        contours_plus = cv2.findContours(plus_binary, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)[0]
+
+        if(len(contours_plus) != 0):
+            index = 0
+            for i in range(0, len(contours_plus)):
+                if(cv2.contourArea(contours_plus[i]) > cv2.contourArea(contours_plus[index])):
+                    index = i
+            self.plusCT = contours_plus[index]
+
         self.the_time = rospy.Time.now()
 
     def cbImage(self, image_msg):
@@ -64,19 +75,8 @@ class Recog:
         self.thread_lock.release()
 
     def plus_test(self, contour):
-        filters_green = [np.array([60, 100, 100]), np.array([88, 255, 255])]  # Green
-
-        plus = cv2.imread("plus.png", 0)
-        _,plus_binary = cv2.threshold(plus,127,255,cv2.THRESH_BINARY_INV)
-        contours_plus = cv2.findContours(plus_binary, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)[0]
-
-        if(len(contours_plus) != 0):
-            index = 0
-            for i in range(0, len(contours_plus)):
-                if(cv2.contourArea(contours_plus[i]) > cv2.contourArea(contours_plus[index])):
-                    index = i
-            if(cv2.matchShapes(the_one, contours_plus[index], 1, 0.0) < 0.2):
-                return " plus"
+        if(cv2.matchShapes(the_one, plusCT, 1, 0.0) < 0.2):
+            return " plus"
         return None
 
     def image_classify(self, image_cv, contour):
