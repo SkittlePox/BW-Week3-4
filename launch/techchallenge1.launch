@@ -1,7 +1,6 @@
 <launch>
     <include file="$(find racecar)/launch/teleop.launch"/>
     <include file="$(find zed_wrapper)/launch/zed.launch"/>
-    <node name = "SafetyStop" pkg ="come_on_and_SLAM" type = "safetystop.py"/>
-    <node name = "RecognizerORB" pkg ="come_on_and_SLAM" type = "recognizer-orb.py"/>
-    <node name = "FieldExplore" pkg ="come_on_and_SLAM" type = "fieldexplore.py"/>
+    <node name = "RecognizerORB" pkg ="racecar_66" type = "recognizer-orb.py"/>
+    <node name = "FieldExplore" pkg ="racecar_66" type = "fieldexplore.py"/>
 </launch>

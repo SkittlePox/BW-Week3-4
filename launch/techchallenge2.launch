@@ -1,7 +1,7 @@
 <launch>
 	<include file="$(find racecar)/launch/teleop.launch"/>
     <include file="$(find zed_wrapper)/launch/zed.launch"/>
-	<node name="ColorTracker" pkg="beaverworks77" type="tracking_v2.py"/>
-	<node name="Control" pkg="beaverworks77" type="controller.py"/>
-	<node name="wall_follower" pkg="beaverworks77" type="wallfollower.py" />
+	<node name="ColorTracker" pkg="racecar_66" type="tracking_v2.py"/>
+	<node name="Control" pkg="racecar_66" type="controller.py"/>
+	<node name="wall_follower" pkg="racecar_66" type="wallfollower.py" />
 </launch>
