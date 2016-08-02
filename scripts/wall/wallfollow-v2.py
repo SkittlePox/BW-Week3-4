@@ -17,7 +17,7 @@ class Wallfollow:
         self.thread_lock = threading.Lock()
 
         # Publishers and Subscribers
-        self.drive_pub = rospy.Publisher("/vesc/ackermann_cmd_mux/input/navigation", AckermannDriveStamped)
+        self.drive_pub = rospy.Publisher("/vesc/ackermann_cmd_mux/input/navigation", AckermannDriveStamped, queue_size=1)
         self.pub_image = rospy.Publisher("/echo_image", Image, queue_size=1)
         #self.sub_image = rospy.Subscriber("/camera/rgb/image_rect_color", Image, self.process_image, queue_size=1)
         self.vision = rospy.Subscriber("/scan", LaserScan, self.drive_control)
@@ -29,17 +29,18 @@ class Wallfollow:
         # Other global variables
         self.kp = 1
 
-        self.run = False
+        self.run = True
         self.direction = 1   #1 for right, -1 for left
         self.the_time = rospy.Time.now()
 
     def drive_control(self, msg):
         if(self.run):
             ranges = msg.ranges
-            crude_distance = min(ranges)
+            crude_distance = min(ranges[80:280])
             d0 = 0.35   # Optimal distance from wall
 
             error = (d0 - crude_distance) * self.kp * self.direction
+            print(crude_distance, error)
             self.drive(error, 0)
 
     def drive(self, angle, speed):
