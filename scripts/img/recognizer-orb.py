@@ -2,7 +2,7 @@
 import cv2
 import rospy
 import numpy as np
-from sensor_msgs.msg import Image
+from sensor_msgs.msg import Image, CompressedImage
 from std_msgs.msg import *
 from cv_bridge import CvBridge, CvBridgeError
 from geometry_msgs.msg import Point
