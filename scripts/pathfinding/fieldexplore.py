@@ -44,7 +44,7 @@ class Fieldexplore:
 
         elif -speed > self.maxspeed:
 	    return -self.maxspeed
-	elif speed - self.lastspeed > self.maxderiv:
+	elif speed - self.lastspeed > self.maxderiv and self.lastspeed > .4:
 	    return self.lastspeed+self.maxderiv
 	else:
             return speed
