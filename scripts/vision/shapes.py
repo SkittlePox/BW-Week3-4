@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 
 img2 = cv2.imread('plus.png')
-img1 = cv2.imread('IMG_20160801_134805.jpg')
+img1 = cv2.imread('green.jpg')
 image1_hsv = cv2.cvtColor(img1, cv2.COLOR_BGR2HSV)
 image2_hsv = cv2.cvtColor(img2, cv2.COLOR_BGR2HSV)
 
