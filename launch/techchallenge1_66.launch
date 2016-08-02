@@ -1,0 +1,7 @@
+<launch>
+    <include file="$(find racecar)/launch/teleop.launch"/>
+    <node name = "SafetyStop" pkg ="come_on_and_SLAM" type = "safetystop.py"/>
+    <include file="$(find zed_wrapper)/launch/zed.launch"/>
+    <node name = "RecognizerORB" pkg ="come_on_and_SLAM" type = "recognizer-orb.py"/>
+    <node name = "FieldExplore" pkg ="come_on_and_SLAM" type = "fieldexplore.py"/>
+</launch>
