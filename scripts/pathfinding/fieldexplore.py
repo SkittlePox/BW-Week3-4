@@ -39,7 +39,6 @@ class Fieldexplore:
 #	print speed
         if speed > self.maxspeed:
 	    if self.maxspeed-self.lastspeed>self.maxderiv and self.lastspeed > .4:
-#		print self.lastspeed+self.maxderiv
 		return self.lastspeed+self.maxderiv
             return self.maxspeed
 	    
@@ -63,8 +62,6 @@ class Fieldexplore:
 	valscale = .0006
 	steercoeff = -10
 	vmin = .25
-#	stoprange=.4
-#	backspeed=-.5
 
 	for i in range(180,900):
 	    vx-=self.coordconvert(scan.ranges[i], i)[0]
@@ -89,10 +86,6 @@ class Fieldexplore:
 	    self.backcharge = 1
 #	    print "reset"
 
-#	    self.right*=-1
-#	if min(scan.ranges[480:600])<stoprange:
-#	    vxo=0
-#	    vyo=backspeed
 	vyo = self.capspeed(vyo)
 #	print vyo
 #	print vyo - self.lastspeed
