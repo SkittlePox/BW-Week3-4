@@ -11,7 +11,6 @@ test = cv2.imread("green.jpg")
 print(test.shape)
 test_hsv = cv2.cvtColor(test, cv2.COLOR_BGR2HSV)
 mask_green = cv2.inRange(test_hsv, filters_green[0], filters_green[1])
-mask_green = cv2.GaussianBlur(mask_green, (3, 3), 0)
 contours_green = cv2.findContours(mask_green, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)[0]
 
 if(len(contours_green) != 0):
