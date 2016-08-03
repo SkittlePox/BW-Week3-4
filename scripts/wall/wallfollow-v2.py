@@ -41,7 +41,7 @@ class Wallfollow:
     def drive_control(self, msg):
         if(self.run):
             d0 = 0.5   # Optimal distance from wall
-            a = 40      # Distance between collection points
+            a = 80      # Distance between collection points
             tolerance = 1   # Span to anerage distances on either side
             midpoints = [900, 180]
             crude_ranges = [[800, 1000], [80, 280]]
@@ -63,7 +63,7 @@ class Wallfollow:
 
             error = (d0 - crude_distance) * self.kpd * self.direction + angle * self.kpa * self.direction
             print(angle, error)
-            self.drive(error, 0)
+            self.drive(error, 2)
 
     def calculate_angle(self, b, f, A):
         # b is the back lidar value, f is the front, and A is the angle between the values
