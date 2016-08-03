@@ -39,25 +39,28 @@ class Wallfollow:
 
     def drive_control(self, msg):
         if(self.run):
-            d0 = 0.35   # Optimal distance from wall
+            d0 = 0.5   # Optimal distance from wall
             a = 40      # Distance between collection points
             tolerance = 1   # Span to anerage distances on either side
             midpoints = [900, 180]
+            crude_ranges = [[800, 1000], [80, 280]]
 
             if(self.direction == 1):
                 mp = midpoints[1]
+                rang = crude_ranges[1]
             else:
                 mp = midpoints[0]
+                rang = crude_ranges[0]
 
             ranges = msg.ranges
-            crude_distance = min(ranges[80:280])
+            crude_distance = min(ranges[rang[0]:rang[1]])
 
             b = np.mean(ranges[(mp + (a / 2 * 4 * -1 * self.direction) - tolerance * 4): (mp + (a / 2 * 4 * -1 * self.direction) + tolerance * 4)])   # Takes into account tolerance
             f = np.mean(ranges[(mp + (a / 2 * 4 * self.direction) - tolerance * 4): (mp + (a / 2 * 4 * self.direction) + tolerance * 4)])   # Takes into account tolerance
 
             angle = self.calculate_angle(b, f, a)
 
-            error = (d0 - crude_distance) * self.kpd * self.direction + angle * self.kpa
+            error = (d0 - crude_distance) * self.kpd * self.direction + angle * self.kpa * self.direction
             print(angle, error)
             self.drive(error, 1)
 
@@ -74,6 +77,9 @@ class Wallfollow:
         return angle
 
     def drive(self, angle, speed):
+        if(speed != 0):
+            print(speed)
+            # Ramp speed
         drive_command = AckermannDriveStamped()
         drive_command.drive.speed = speed
         drive_command.drive.steering_angle = angle
