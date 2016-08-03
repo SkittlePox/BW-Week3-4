@@ -87,8 +87,12 @@ class Wallfollow:
         self.drive_pub.publish(drive_command)
 
     def handle_joy(self, msg):
-        if(msg.buttons[0] == 1):
+        if(msg.buttons[0] == 1):    # A button
             self.run = True
+        if(msg.buttons[2] == 1):    # X button
+            self.direction = -1
+        elif(msg.buttons[1] == 1):  # B button
+            self.direction = 1
 
 if __name__ == "__main__":
     rospy.init_node('Wallfollow')
