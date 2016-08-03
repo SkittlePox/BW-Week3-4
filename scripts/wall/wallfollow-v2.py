@@ -31,8 +31,8 @@ class Wallfollow:
         self.bridge = CvBridge()
 
         # Other global variables
-        self.kpd = 1        # For distance
-        self.kpa = 1 / 120.0   # For angle
+        self.kpd = 0.5        # For distance
+        self.kpa = 1 / 80 #120.0   # For angle
 
         self.run = False
         self.direction = -1  # 1 for right, -1 for left
@@ -42,7 +42,7 @@ class Wallfollow:
     def drive_control(self, msg):
         if(self.run):
             d0 = 0.75   # Optimal distance from wall
-            a = 80      # Distance between collection points
+            a = 60      # Distance between collection points
             tolerance = 1   # Span to anerage distances on either side
             midpoints = [900, 180]
             crude_ranges = [[800, 1000], [80, 280]]
