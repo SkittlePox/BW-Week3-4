@@ -23,7 +23,7 @@ class Wallfollow:
         # Publishers and Subscribers
         self.drive_pub = rospy.Publisher("/vesc/ackermann_cmd_mux/input/navigation", AckermannDriveStamped, queue_size=1)
         self.pub_image = rospy.Publisher("/echo_image", Image, queue_size=1)
-        #self.sub_image = rospy.Subscriber("/camera/rgb/image_rect_color", Image, self.thread_image, queue_size=1)
+        self.sub_image = rospy.Subscriber("/camera/rgb/image_rect_color", Image, self.thread_image, queue_size=1)
         self.vision = rospy.Subscriber("/scan", LaserScan, self.drive_control)
         self.joystick = rospy.Subscriber("/vesc/joy", Joy, self.handle_joy)
 
@@ -110,18 +110,27 @@ class Wallfollow:
         image_cv = self.bridge.imgmsg_to_cv2(image_msg)
         the_one, color_scheme, display_text = self.color_search(image_cv)
 
-        if(the_one is not None):
-            self.paint_image(image_cv, the_one, color_scheme, display_text)
+        if(display_text == "red"):
+            self.direction = 1
+            print("Switching to right side")
+        elif(display_text == "green"):
+            self.direction = -1
+            print("Switching to left side")
+
+        #if(the_one is not None):
+            #image_cv = self.paint_image(image_cv, the_one, color_scheme, display_text)
+        #self.pub_image.publish(self.bridge.cv2_to_imgmsg(image_cv, "bgr8"))
+
+        self.thread_lock.release()
 
     def paint_image(self, image_cv, the_one, color_scheme, display_text):
         cv2.drawContours(image_cv, [the_one], -1, (color_scheme.b, color_scheme.g, color_scheme.r))
         x, y, w, h = cv2.boundingRect(the_one)
-        v2.rectangle(image_cv, (x, y), (x + w, y + h), (color_scheme.b, color_scheme.g, color_scheme.r, 2))
+        cv2.rectangle(image_cv, (x, y), (x + w, y + h), (color_scheme.b, color_scheme.g, color_scheme.r, 2))
         cv2.circle(image_cv, (x + w / 2, y + h / 2), 4, (255, 255, 255), -1)
         font = cv2.FONT_HERSHEY_SIMPLEX
         cv2.putText(image_cv, display_text, (x + w / 2, y + 3 * h / 4), font, 2, (255, 255, 255), 2)
-
-        self.pub_image.publish(self.bridge.cv2_to_imgmsg(image_cv, "bgr8"))
+	return image_cv
 
 
     def color_search(self, image_cv):
@@ -186,10 +195,7 @@ class Wallfollow:
                 for j in range(0, len(contours[i])):
                     if(cv2.contourArea(contours[i][j]) > cv2.contourArea(max_contour)):
                         max_contour = contours[i][j]
-                if(i == 4):  # Pink
-                    largest_areas.append(cv2.contourArea(max_contour) * 1.5)
-                else:
-                    largest_areas.append(cv2.contourArea(max_contour))  # Place the largest found contour's area in the largest_areas array
+                largest_areas.append(cv2.contourArea(max_contour))  # Place the largest found contour's area in the largest_areas array
                 largest_contours.append(max_contour)                # Place the contour itself in the largest_contours array
             else:   # If no contours exist for a given mask populated it with empty values
                 largest_areas.append(0)
