@@ -28,7 +28,7 @@ class Vision:
             return
         image_cv = self.bridge.imgmsg_to_cv2(image_msg)
 
-        # todo: detect height and moment of red/green
+        # TODO detect height and moment of red/green
 
         msg = Int32MultiArray()
         msg.data = [foo, bar, baz]
