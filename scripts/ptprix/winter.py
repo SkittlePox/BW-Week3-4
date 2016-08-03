@@ -25,6 +25,7 @@ class PotentialField:
         self.charge_laser_particle = 0.07
         self.charge_forward_boost = 25.0
         self.boost_distance = 0.5
+
         self.p_speed = 0.007
         self.p_steering = 1.0
 
@@ -40,7 +41,7 @@ class PotentialField:
         #print("Starting increment {} increment {}".format(msg.angle_min, msg.angle_increment))
 
         # Create potential gradients for all laser scan particles
-        scan_rad_angles = ( (msg.angle_increment * np.arange(1081, dtype=float)) + msg.angle_min )
+        scan_rad_angles = ( (msg.angle_increment * np.arange(1081, dtype=float)) + msg.angle_min)
 
         scan_x_unit_vectors = -np.cos(scan_rad_angles)
         scan_y_unit_vectors = -np.sin(scan_rad_angles)
