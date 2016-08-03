@@ -17,7 +17,7 @@ class Controller:
 
         self.charge_laser_particle = 0.07
         self.charge_forward_boost = 50.0
-        self.boost_distance = 0.5
+        self.boost_distance = 0.5  # const
         self.p_speed = 0.007
         self.p_steering = 2.0
 
@@ -36,7 +36,6 @@ class Controller:
         scan_y_components = (self.charge_laser_particle *
                              scan_y_unit_vectors) / np.square(msg.ranges)
 
-        # Add the potential for the point behind the robot (to give it a kick)
         kick_x_component = (
             np.ones(1) * self.charge_forward_boost / self.boost_distance**2.0)
         kick_y_component = np.zeros(1)
