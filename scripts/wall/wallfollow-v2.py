@@ -34,7 +34,7 @@ class Wallfollow:
         self.kpd = 1        # For distance
         self.kpa = 1 / 120.0   # For angle
 
-        self.run = True
+        self.run = False
         self.direction = -1  # 1 for right, -1 for left
         self.the_time = rospy.Time.now()
         self.joy_time = rospy.Time.now()
