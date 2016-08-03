@@ -2,7 +2,7 @@
 
 import rospy
 import math
-import numpy
+import numpy as np
 
 from ackermann_msgs.msg import AckermannDriveStamped
 from sensor_msgs.msg import LaserScan
