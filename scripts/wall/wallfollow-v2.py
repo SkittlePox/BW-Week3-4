@@ -23,7 +23,7 @@ class Wallfollow:
         # Publishers and Subscribers
         self.drive_pub = rospy.Publisher("/vesc/ackermann_cmd_mux/input/navigation", AckermannDriveStamped, queue_size=1)
         self.pub_image = rospy.Publisher("/echo_image", Image, queue_size=1)
-        #self.sub_image = rospy.Subscriber("/camera/rgb/image_rect_color", Image, self.thread_image, queue_size=1)
+        self.sub_image = rospy.Subscriber("/camera/rgb/image_rect_color", Image, self.thread_image, queue_size=1)
         self.vision = rospy.Subscriber("/scan", LaserScan, self.drive_control)
         self.joystick = rospy.Subscriber("/vesc/joy", Joy, self.handle_joy)
 
@@ -111,17 +111,19 @@ class Wallfollow:
         the_one, color_scheme, display_text = self.color_search(image_cv)
 
         if(the_one is not None):
-            self.paint_image(image_cv, the_one, color_scheme, display_text)
+            image_cv = self.paint_image(image_cv, the_one, color_scheme, display_text)
+
+        self.pub_image.publish(self.bridge.cv2_to_imgmsg(image_cv, "bgr8"))
+	self.thread_lock.release()
 
     def paint_image(self, image_cv, the_one, color_scheme, display_text):
         cv2.drawContours(image_cv, [the_one], -1, (color_scheme.b, color_scheme.g, color_scheme.r))
         x, y, w, h = cv2.boundingRect(the_one)
-        v2.rectangle(image_cv, (x, y), (x + w, y + h), (color_scheme.b, color_scheme.g, color_scheme.r, 2))
+        cv2.rectangle(image_cv, (x, y), (x + w, y + h), (color_scheme.b, color_scheme.g, color_scheme.r, 2))
         cv2.circle(image_cv, (x + w / 2, y + h / 2), 4, (255, 255, 255), -1)
         font = cv2.FONT_HERSHEY_SIMPLEX
         cv2.putText(image_cv, display_text, (x + w / 2, y + 3 * h / 4), font, 2, (255, 255, 255), 2)
-
-        self.pub_image.publish(self.bridge.cv2_to_imgmsg(image_cv, "bgr8"))
+	return image_cv
 
 
     def color_search(self, image_cv):
