@@ -36,6 +36,7 @@ class Wallfollow:
         self.run = True
         self.direction = 1  # 1 for right, -1 for left
         self.the_time = rospy.Time.now()
+        self.joy_time = rospy.Time.now()
 
     def drive_control(self, msg):
         if(self.run):
@@ -62,7 +63,7 @@ class Wallfollow:
 
             error = (d0 - crude_distance) * self.kpd * self.direction + angle * self.kpa * self.direction
             print(angle, error)
-            self.drive(error, 1)
+            self.drive(error, 0)
 
     def calculate_angle(self, b, f, A):
         # b is the back lidar value, f is the front, and A is the angle between the values
@@ -87,8 +88,9 @@ class Wallfollow:
         self.drive_pub.publish(drive_command)
 
     def handle_joy(self, msg):
-        if(msg.buttons[0] == 1):    # A button
-            self.run = True
+        if(msg.buttons[0] == 1 and rospy.Time.now() - self.joy_time >= rospy.Duration(0.5, 0)):    # A button
+            self.run = not self.run
+            self.joy_time = rospy.Time.now()
         if(msg.buttons[2] == 1):    # X button
             self.direction = -1
         elif(msg.buttons[1] == 1):  # B button
