@@ -15,8 +15,8 @@ class Controller:
             '/vesc/ackermann_cmd_mux/input/navigation', AckermannDriveStamped,
             queue_size=1)
 
-        self.charge_laser_particle = 0.07
-        self.charge_forward_boost = 50.0
+        self.charge_laser_particle = 0.20  # 0.07
+        # self.charge_forward_boost = 50.0
         self.boost_distance = 0.5  # const
         self.speed_const = 2.0
         self.p_speed = 0.007
@@ -38,6 +38,7 @@ class Controller:
         scan_y_components = (self.charge_laser_particle *
                              scan_y_unit_vectors) / np.square(msg.ranges)
 
+        # TODO: no squaring
         total_x_component = np.sum(scan_x_components) + sum(
             self.x_components.values())
         print("x/sum", total_x_component, sum(self.x_components.values()))
