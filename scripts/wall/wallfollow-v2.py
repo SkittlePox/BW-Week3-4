@@ -35,14 +35,14 @@ class Wallfollow:
         self.kpa = 1 / 120.0   # For angle
 
         self.run = True
-        self.direction = 1  # 1 for right, -1 for left
+        self.direction = -1  # 1 for right, -1 for left
         self.the_time = rospy.Time.now()
         self.joy_time = rospy.Time.now()
 
     def drive_control(self, msg):
         if(self.run):
-            d0 = 0.5   # Optimal distance from wall
-            a = 60      # Distance between collection points
+            d0 = 0.75   # Optimal distance from wall
+            a = 80      # Distance between collection points
             tolerance = 1   # Span to anerage distances on either side
             midpoints = [900, 180]
             crude_ranges = [[800, 1000], [80, 280]]
