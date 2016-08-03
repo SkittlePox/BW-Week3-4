@@ -20,10 +20,10 @@ class Controller:
         self.boost_distance = 0.5  # const
         self.speed_const = 2.0
         self.p_speed = 0.007
-        self.p_steering = 1.5
+        self.p_steering = 1.0
 
         # self.x_components = {"backCharge": 50.0}
-        self.x_components = {"backCharge": 50.0}
+        self.x_components = {"backCharge": 200.0}
         self.y_components = {}
 
     def scanReceived(self, msg):
@@ -38,23 +38,18 @@ class Controller:
         scan_y_components = (self.charge_laser_particle *
                              scan_y_unit_vectors) / np.square(msg.ranges)
 
-        kick_x_component = (
-            np.ones(1) * self.x_components["backCharge"] /
-            self.boost_distance**2.0)
-        print(kick_x_component)
-        kick_y_component = np.zeros(1)
-
         total_x_component = np.sum(scan_x_components) + sum(
             self.x_components.values())
+        print("x/sum", total_x_component, sum(self.x_components.values()))
         total_y_component = np.sum(scan_y_components) + sum(
             self.y_components.values())
 
         angle = (self.p_steering * np.sign(total_x_component) * math.atan2(
             total_y_component, total_x_component))
 
-        speed = (self.p_speed * np.sign(total_x_component) * math.sqrt(
-            total_x_component**2 + total_y_component**2))
-        # speed = self.speed_const
+        # speed = (self.p_speed * np.sign(total_x_component) * math.sqrt(
+        #    total_x_component**2 + total_y_component**2))
+        speed = self.speed_const
 
         self.drive(angle, speed)
 
