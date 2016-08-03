@@ -52,9 +52,9 @@ class Controller:
         angle = (self.p_steering * np.sign(total_x_component) * math.atan2(
             total_y_component, total_x_component))
 
-        # speed = (self.p_speed * np.sign(total_x_component) * math.sqrt(
-        #    total_x_component**2 + total_y_component**2))
-        speed = self.speed_const
+        speed = (self.p_speed * np.sign(total_x_component) * math.sqrt(
+            total_x_component**2 + total_y_component**2))
+        # speed = self.speed_const
 
         self.drive(angle, speed)
 
