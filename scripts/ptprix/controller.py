@@ -22,7 +22,8 @@ class Controller:
         self.p_speed = 0.007
         self.p_steering = 2.0
 
-        self.x_components = {"backCharge": 50.0}
+        # self.x_components = {"backCharge": 50.0}
+        self.x_components = {}
         self.y_components = {}
 
     def scanReceived(self, msg):
