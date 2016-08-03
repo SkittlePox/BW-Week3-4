@@ -23,7 +23,7 @@ class Controller:
         self.p_steering = 2.0
 
         self.x_components = {}
-        self.y_components = {"backCharge:" 50.0}
+        self.y_components = {"backCharge": 50.0}
 
     def scanReceived(self, msg):
         scan_rad_angles = ((msg.angle_increment *
