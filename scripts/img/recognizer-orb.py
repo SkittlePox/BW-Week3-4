@@ -24,9 +24,10 @@ class Recog:
 
         self.count = 0
 
+        """
         plus = cv2.imread("plus.png", 0)
         _, plus_binary = cv2.threshold(plus, 127, 255, cv2.THRESH_BINARY_INV)
-        contours_plus = cv2.findContours(plus_binary, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)[0]
+        _, contours_plus,_ = cv2.findContours(plus_binary, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
         if(len(contours_plus) != 0):
             index = 0
@@ -34,7 +35,7 @@ class Recog:
                 if(cv2.contourArea(contours_plus[i]) > cv2.contourArea(contours_plus[index])):
                     index = i
             self.plusCT = contours_plus[index]
-
+        """
         self.the_time = rospy.Time.now()
 
     def cbImage(self, image_msg):
@@ -45,8 +46,8 @@ class Recog:
     def processImage(self, image_msg):
         try:
             self._processImage(image_msg)
-        except:
-            print("Oh no!")
+        except Exception, e:
+            print(str(e))
 
     def _processImage(self, image_msg):
         if not self.thread_lock.acquire(False):
@@ -57,14 +58,14 @@ class Recog:
 
         the_one, color_scheme, display_text = self.color_search(image_cv)
         if not (the_one is None):  # If there is a blob
-            shape = self.plus_test(the_one)
+            #shape = self.plus_test(the_one)
             # Drawing contours
             cv2.drawContours(image_cv, [the_one], -1, (color_scheme.b, color_scheme.g, color_scheme.r))
             x, y, w, h = cv2.boundingRect(the_one)
             if(display_text == "pink"):
                 display_text = self.image_classify(image_cv, the_one)
-            elif(shape is not None):
-                display_text += shape
+            #elif(shape is not None):
+                #display_text += shape
             cv2.rectangle(image_cv, (x, y), (x + w, y + h), (color_scheme.b, color_scheme.g, color_scheme.r, 2))
             cv2.circle(image_cv, (x + w / 2, y + h / 2), 4, (255, 255, 255), -1)
             font = cv2.FONT_HERSHEY_SIMPLEX
@@ -193,12 +194,12 @@ class Recog:
     def color_search(self, image_cv):
         image_hsv = cv2.cvtColor(image_cv, cv2.COLOR_BGR2HSV)
 
-        filters_red = [np.array([0, 165, 100]), np.array([6, 255, 255])]  # Red
-        filters_red2 = [np.array([170, 165, 170]), np.array([180, 255, 255])]  # Red
-        filters_green = [np.array([60, 100, 100]), np.array([88, 255, 255])]  # Green
-        filters_yellow = [np.array([22, 150, 114]), np.array([33, 255, 190])]  # Yellow
-        filters_blue = [np.array([106, 127, 70]), np.array([127, 235, 215])]  # Blue
-        filters_pink = [np.array([144, 91, 146]), np.array([165, 145, 255])]  # Pink
+        filters_red = [np.array([0, 165, 70]), np.array([6, 255, 255])]  # Red
+        filters_red2 = [np.array([170, 165, 140]), np.array([180, 255, 255])]  # Red
+        filters_green = [np.array([50, 100, 30]), np.array([88, 255, 255])]  # Green
+        filters_yellow = [np.array([22, 150, 84]), np.array([40, 255, 190])]  # Yellow
+        filters_blue = [np.array([106, 127, 40]), np.array([127, 235, 215])]  # Blue
+        filters_pink = [np.array([144, 91, 116]), np.array([165, 145, 255])]  # Pink
 
         mask_red = cv2.inRange(image_hsv, filters_red[0], filters_red[1])
         mask_red2 = cv2.inRange(image_hsv, filters_red2[0], filters_red2[1])
