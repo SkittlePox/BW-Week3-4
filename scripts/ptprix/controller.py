@@ -10,7 +10,6 @@ from sensor_msgs.msg import LaserScan
 
 class Controller:
     def __init__(self):
-        rospy.init_node('Controller')
         rospy.Subscriber('scan', LaserScan, self.scanReceived)
         self.drivepub = rospy.Publisher(
             '/vesc/ackermann_cmd_mux/input/navigation', AckermannDriveStamped,
@@ -62,6 +61,6 @@ class Controller:
         self.drivepub.publish(ackmsg)
 
 if __name__ == '__main__':
-    rospy.init_node("FieldExplore")
-    node = Fieldexplore()
+    rospy.init_node('Controller')
+    node = Controller()
     rospy.spin()
