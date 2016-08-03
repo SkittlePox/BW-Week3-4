@@ -2,13 +2,16 @@
 
 import cv2
 import rospy
+import numpy as np
 from ackermann_msgs.msg import *
 from sensor_msgs.msg import *
 from nav_msgs.msg import *
 from cv_bridge import CvBridge, CvBridgeError
 import threading
-import sys, math
+import sys
+import math
 from std_msgs.msg import Float32MultiArray
+
 
 class Wallfollow:
 
@@ -27,21 +30,48 @@ class Wallfollow:
         self.bridge = CvBridge()
 
         # Other global variables
-        self.kp = 1
+        self.kpd = 1        # For distance
+        self.kpa = 1 / 15.0   # For angle
 
         self.run = True
-        self.direction = 1   #1 for right, -1 for left
+        self.direction = 1  # 1 for right, -1 for left
         self.the_time = rospy.Time.now()
 
     def drive_control(self, msg):
         if(self.run):
+            d0 = 0.35   # Optimal distance from wall
+            a = 60      # Distance between collection points
+            tolerance = 1   # Span to anerage distances on either side
+            midpoints = [900, 180]
+
+            if(self.direction == 1):
+                mp = midpoints[1]
+            else:
+                mp = midpoints[0]
+
             ranges = msg.ranges
             crude_distance = min(ranges[80:280])
-            d0 = 0.35   # Optimal distance from wall
 
-            error = (d0 - crude_distance) * self.kp * self.direction
-            print(crude_distance, error)
+            b = np.mean(ranges[(mp + (a / 2 * 4 * -1 * self.direction) - tolerance * 4): (mp + (a / 2 * 4 * -1 * self.direction) + tolerance * 4)])   # Takes into account tolerance
+            f = np.mean(ranges[(mp + (a / 2 * 4 * self.direction) - tolerance * 4): (mp + (a / 2 * 4 * self.direction) + tolerance * 4)])   # Takes into account tolerance
+
+            angle = self.calculate_angle(b, f, A)
+
+            error = (d0 - crude_distance) * self.kpd * self.direction + angle * self.kpd
+            print(angle, error)
             self.drive(error, 0)
+
+    def calculate_angle(self, b, f, A):
+        # b is the back lidar value, f is the front, and A is the angle between the values
+        # Capital is an angle, lowercase is a side length
+        if(b == f):     # Bad things can happen when the values equal each other
+            b += 0.00001
+        a = math.sqrt(math.fabs(b**2 + f**2 - 2 * b * f * math.cos(math.radians(A))))     # Law of Cosines
+        B = math.degrees(math.asin(math.sin(math.radians(A)) * min([b, f]) / a))  # Law of Sines
+        angle = 90 - B - A / 2.0
+        if (b < f):
+            angle *= -1
+        return angle
 
     def drive(self, angle, speed):
         drive_command = AckermannDriveStamped()
