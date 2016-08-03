@@ -18,6 +18,7 @@ class Controller:
         self.charge_laser_particle = 0.07
         self.charge_forward_boost = 50.0
         self.boost_distance = 0.5  # const
+        self.speed_const = 2.0
         self.p_speed = 0.007
         self.p_steering = 2.0
 
@@ -48,8 +49,9 @@ class Controller:
         angle = (self.p_steering * np.sign(total_x_component) * math.atan2(
             total_y_component, total_x_component))
 
-        speed = (self.p_speed * np.sign(total_x_component) * math.sqrt(
-            total_x_component**2 + total_y_component**2))
+        # speed = (self.p_speed * np.sign(total_x_component) * math.sqrt(
+        #    total_x_component**2 + total_y_component**2))
+        speed = self.speed_const
 
         self.drive(angle, speed)
 
