@@ -31,7 +31,7 @@ class Wallfollow:
 
         # Other global variables
         self.kpd = 1        # For distance
-        self.kpa = 1 / 15.0   # For angle
+        self.kpa = 1 / 120.0   # For angle
 
         self.run = True
         self.direction = 1  # 1 for right, -1 for left
@@ -40,7 +40,7 @@ class Wallfollow:
     def drive_control(self, msg):
         if(self.run):
             d0 = 0.35   # Optimal distance from wall
-            a = 60      # Distance between collection points
+            a = 40      # Distance between collection points
             tolerance = 1   # Span to anerage distances on either side
             midpoints = [900, 180]
 
@@ -55,11 +55,11 @@ class Wallfollow:
             b = np.mean(ranges[(mp + (a / 2 * 4 * -1 * self.direction) - tolerance * 4): (mp + (a / 2 * 4 * -1 * self.direction) + tolerance * 4)])   # Takes into account tolerance
             f = np.mean(ranges[(mp + (a / 2 * 4 * self.direction) - tolerance * 4): (mp + (a / 2 * 4 * self.direction) + tolerance * 4)])   # Takes into account tolerance
 
-            angle = self.calculate_angle(b, f, A)
+            angle = self.calculate_angle(b, f, a)
 
-            error = (d0 - crude_distance) * self.kpd * self.direction + angle * self.kpd
+            error = (d0 - crude_distance) * self.kpd * self.direction + angle * self.kpa
             print(angle, error)
-            self.drive(error, 0)
+            self.drive(error, 1)
 
     def calculate_angle(self, b, f, A):
         # b is the back lidar value, f is the front, and A is the angle between the values
