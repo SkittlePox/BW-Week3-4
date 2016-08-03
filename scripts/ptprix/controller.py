@@ -52,7 +52,7 @@ class Controller:
         speed = (self.p_speed * np.sign(total_x_component) * math.sqrt(
             total_x_component**2 + total_y_component**2))
 
-        self.drive(angle, )
+        self.drive(angle, speed)
 
     def drive(self, angle, speed):
         ackmsg = AckermannDriveStamped()
