@@ -23,7 +23,7 @@ class Controller:
         self.p_steering = 1.5
 
         # self.x_components = {"backCharge": 50.0}
-        self.x_components = {}
+        self.x_components = {"backCharge": 50.0}
         self.y_components = {}
 
     def scanReceived(self, msg):
@@ -39,7 +39,9 @@ class Controller:
                              scan_y_unit_vectors) / np.square(msg.ranges)
 
         kick_x_component = (
-            np.ones(1) * self.charge_forward_boost / self.boost_distance**2.0)
+            np.ones(1) * self.x_components["backCharge"] /
+            self.boost_distance**2.0)
+        print(kick_x_component)
         kick_y_component = np.zeros(1)
 
         total_x_component = np.sum(scan_x_components) + sum(
