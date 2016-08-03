@@ -42,15 +42,16 @@ class Controller:
         self.charge_forward_boost / self.boost_distance**2.0
         kick_y_component = np.zeros(1)
 
-        total_x_component = np.sum(scan_x_components) +
-        sum(self.x_components.values())
-        total_y_component = np.sum(scan_y_components) +
-        sum(self.y_components.values())
+        total_x_component = np.sum(scan_x_components) + sum(
+            self.x_components.values())
+        total_y_component = np.sum(scan_y_components) + sum(
+            self.y_components.values())
 
-        angle = (self.p_steering * np.sign(total_x_component) *
-                 math.atan2(total_y_component, total_x_component))
+        angle = (self.p_steering * np.sign(total_x_component) * math.atan2(
+            total_y_component, total_x_component))
 
-
+        speed = (self.p_speed * np.sign(total_x_component) * math.sqrt(
+            total_x_component**2 + total_y_component**2))
 
         self.drive(angle, )
 
