@@ -23,11 +23,11 @@ class PotentialField:
     def __init__(self):
         # initialize potential field variables
         self.charge_laser_particle = 0.07
-        self.charge_forward_boost = 25.0
+        self.charge_forward_boost = 50.0
         self.boost_distance = 0.5
 
         self.p_speed = 0.007
-        self.p_steering = 1.0
+        self.p_steering = 2.0
 
         # subscribe to laserscans. Force output message data to be in numpy arrays.
         rospy.Subscriber("/scan", numpy_msg(LaserScan), self.scan_callback)

@@ -38,13 +38,13 @@ class Fieldexplore:
     def capspeed(self, speed):
 #	print speed
         if speed > self.maxspeed:
-	    if self.maxspeed-self.lastspeed>self.maxderiv and self.lastspeed > .4:
+	    if self.maxspeed-self.lastspeed>self.maxderiv and self.lastspeed > .5:
 		return self.lastspeed+self.maxderiv
             return self.maxspeed
 
         elif -speed > self.maxspeed:
 	    return -self.maxspeed
-	elif speed - self.lastspeed > self.maxderiv:
+	elif speed - self.lastspeed > self.maxderiv and self.lastspeed > .4:
 	    return self.lastspeed+self.maxderiv
 	else:
             return speed
@@ -87,8 +87,8 @@ class Fieldexplore:
 #	    print "reset"
 
 	vyo = self.capspeed(vyo)
-#	print vyo
-#	print vyo - self.lastspeed
+	print vyo
+	print vyo - self.lastspeed
 	self.lastspeed = vyo
 
 	self.drive(vxo, vyo)
