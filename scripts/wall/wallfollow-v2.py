@@ -31,7 +31,7 @@ class Wallfollow:
         self.bridge = CvBridge()
 
         # Other global variables
-        self.kpd = 0.5        # For distance
+        self.kpd = 2        # For distance
         self.kpa = 1 / 80 #120.0   # For angle
 
         self.run = False
@@ -111,11 +111,11 @@ class Wallfollow:
         the_one, color_scheme, display_text = self.color_search(image_cv)
 
         if(display_text == "red"):
-            self.direction = 1
-            print("Switching to right side")
+            #self.direction = 1
+            print("Try: Switching to right side")
         elif(display_text == "green"):
-            self.direction = -1
-            print("Switching to left side")
+            #self.direction = -1
+            print("Try: Switching to left side")
 
         #if(the_one is not None):
             #image_cv = self.paint_image(image_cv, the_one, color_scheme, display_text)
