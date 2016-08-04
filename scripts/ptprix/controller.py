@@ -31,13 +31,18 @@ class Controller:
 
     def detectReceived(self, msg):
         x, area, color = msg.data
+        coeff = 300
+        print("ye")
         print(x, area, color)
         if area > 200 and color != -1:
             if color == 0:
-                self.y_components['leftCharge'] = -100.0
+                self.y_components['leftCharge'] = -coeff
+                print("right")
             elif color == 1:
-                self.y_components['leftCharge'] = 100.0
+                self.y_components['leftCharge'] = coeff
+                print("strsaight")
         else:
+            print("non")
             self.y_components['leftCharge'] = 0.0
 
     def scanReceived(self, msg):

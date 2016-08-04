@@ -14,7 +14,7 @@ class Vision:
         self.thread_lock = threading.Lock()
         rospy.Subscriber(
             '/camera/rgb/image_rect_color', Image, self.cbImage, queue_size=1)
-        self.pub = rospy.Publisher('/detect', Int32MultiArray, queue_size=1)
+        self.pub = rospy.Publisher('detect', Int32MultiArray, queue_size=1)
 
         self.pub_image = rospy.Publisher("~echo_image", Image, queue_size=1)
         self.bridge = CvBridge()
@@ -48,8 +48,8 @@ class Vision:
             greens = [np.array([54, 110, 10]), np.array([72, 180, 200])]
             mask = cv2.inRange(hsv, greens[0], greens[1])
         else:
-            filters_red = [np.array([0, 145, 70]), np.array([15, 255, 255])]
-            filters_red2 = [np.array([170, 145, 140]),
+            filters_red = [np.array([0, 165, 70]), np.array([8, 255, 255])]
+            filters_red2 = [np.array([170, 165, 140]),
                             np.array([180, 255, 255])]
             mask_red = cv2.inRange(hsv, filters_red[0], filters_red[1])
             mask_red2 = cv2.inRange(hsv, filters_red2[0],
