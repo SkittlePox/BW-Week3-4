@@ -17,10 +17,11 @@ class Controller:
             queue_size=1)
 
         self.charge_laser_particle = 0.07
+
         self.boost_distance = 0.5
-        self.speed_const = 2.0
+        self.speed_const = 3.0
         self.p_speed = 0.007
-        self.p_steering = 1
+        self.p_steering = 2
 
         self.x_components = {"backCharge": 200.0}
         self.y_components = {"leftCharge": 0.0}
@@ -44,9 +45,9 @@ class Controller:
         scan_y_unit_vectors = -np.sin(scan_rad_angles)
 
         scan_x_components = (self.charge_laser_particle *
-                             scan_x_unit_vectors) / msg.ranges
+                             scan_x_unit_vectors) / np.sqrt(msg.ranges)
         scan_y_components = (self.charge_laser_particle *
-                             scan_y_unit_vectors) / msg.ranges
+                             scan_y_unit_vectors) / np.sqrt(msg.ranges)
 
         total_x_component = np.sum(scan_x_components) + sum(
             self.x_components.values())

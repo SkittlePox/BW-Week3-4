@@ -31,8 +31,8 @@ class Wallfollow:
         self.bridge = CvBridge()
 
         # Other global variables
-        self.kpd = 2        # For distance
-        self.kpa = 1 / 80 #120.0   # For angle
+        self.kpd = 0.4        # For distance
+        self.kpa = 1 / 150.0   # For angle
 
         self.run = False
         self.direction = -1  # 1 for right, -1 for left
@@ -42,8 +42,8 @@ class Wallfollow:
 
     def drive_control(self, msg):
         if(self.run):
-            d0 = 0.75   # Optimal distance from wall
-            a = 60      # Distance between collection points
+            d0 = 0.6   # Optimal distance from wall
+            a = 90      # Distance between collection points
             tolerance = 1   # Span to anerage distances on either side
             midpoints = [900, 180]
             crude_ranges = [[800, 1000], [80, 280]]
@@ -64,7 +64,7 @@ class Wallfollow:
             angle = self.calculate_angle(b, f, a)
 
             error = (d0 - crude_distance) * self.kpd * self.direction + angle * self.kpa * self.direction
-            print(angle, error)
+            #print(angle, error)
             self.drive(error, 3)
 
     def calculate_angle(self, b, f, A):
@@ -155,12 +155,12 @@ class Wallfollow:
         return image_cv
 
     def color_search(self, image_cv):
-        threshold = 10000
+        threshold = 1000
         image_hsv = cv2.cvtColor(image_cv, cv2.COLOR_BGR2HSV)
 
         filters_go = [np.array([22, 60, 30]), np.array([88, 255, 150])]  # Yellow and Green
         filters_green = [np.array([54, 110, 10]), np.array([72, 180, 200])] # Green
-        filters_red = [np.array([0, 165, 70]), np.array([6, 255, 255])]  # Red1
+        filters_red = [np.array([0, 165, 70]), np.array([8, 255, 255])]  # Red1
         filters_red2 = [np.array([170, 165, 140]), np.array([180, 255, 255])]  # Red2
 
         mask_go = cv2.inRange(image_hsv, filters_go[0], filters_go[1])
@@ -204,8 +204,8 @@ class Wallfollow:
             if(cv2.contourArea(contours_green[i]) > cv2.contourArea(contours_green[max_index_g])):
                 max_index_g = i
 
-         the_green = contours_green[max_index_g]
-         the_red = contours_red[max_index_r]
+        the_green = contours_green[max_index_g]
+        the_red = contours_red[max_index_r]
 
         if(cv2.contourArea(the_green) > cv2.contourArea(the_red) and cv2.contourArea(the_green) > threshold):
             return True, the_green
