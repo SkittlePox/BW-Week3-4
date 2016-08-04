@@ -11,6 +11,7 @@ from sensor_msgs.msg import LaserScan
 class Controller:
     def __init__(self):
         rospy.Subscriber('scan', LaserScan, self.scanReceived)
+        rospy.Subscriber('detect', LaserScan, self.detectReceived)
         self.drivepub = rospy.Publisher(
             '/vesc/ackermann_cmd_mux/input/navigation', AckermannDriveStamped,
             queue_size=1)
@@ -22,8 +23,19 @@ class Controller:
         self.p_speed = 0.007
         self.p_steering = 2
 
-        self.x_components = {"backCharge": 300.0}
-        self.y_components = {}
+        self.x_components = {"backCharge": 200.0}
+        self.y_components = {"leftCharge": 0.0}
+
+    def detectReceived(self, msg):
+        x, area, color = msg.data
+        print(x, area, color)
+        if area > 200 and color != -1:
+            if color == 0:
+                self.y_components['leftCharge'] = -100.0
+            elif color == 1:
+                self.y_components['leftCharge'] = 100.0
+        else:
+            self.y_components['leftCharge'] = 0.0
 
     def scanReceived(self, msg):
         scan_rad_angles = ((msg.angle_increment *
@@ -39,7 +51,7 @@ class Controller:
 
         total_x_component = np.sum(scan_x_components) + sum(
             self.x_components.values())
-        print("x/sum", total_x_component, sum(self.x_components.values()))
+        # print("x/sum", total_x_component, sum(self.x_components.values()))
         total_y_component = np.sum(scan_y_components) + sum(
             self.y_components.values())
 

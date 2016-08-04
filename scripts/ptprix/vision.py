@@ -32,7 +32,7 @@ class Vision:
             ms = self.findPoly(image_msg, 0)
         if(ms is None):
             ms = self.getDefaultMsg()
-
+        print(ms.data)
         self.pub.publish(ms)
         self.thread_lock.release()
 
