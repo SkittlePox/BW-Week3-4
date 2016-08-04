@@ -204,8 +204,8 @@ class Wallfollow:
             if(cv2.contourArea(contours_green[i]) > cv2.contourArea(contours_green[max_index_g])):
                 max_index_g = i
 
-         the_green = contours_green[max_index_g]
-         the_red = contours_red[max_index_r]
+        the_green = contours_green[max_index_g]
+        the_red = contours_red[max_index_r]
 
         if(cv2.contourArea(the_green) > cv2.contourArea(the_red) and cv2.contourArea(the_green) > threshold):
             return True, the_green
