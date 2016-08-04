@@ -157,9 +157,62 @@ class Wallfollow:
         image_hsv = cv2.cvtColor(image_cv, cv2.COLOR_BGR2HSV)
 
         filters_go = [np.array([22, 60, 30]), np.array([88, 255, 150])]  # Yellow and Green
+        filters_green = [np.array([54, 110, 10]), np.array([72, 180, 200])] # Green
+        filters_red = [np.array([0, 165, 70]), np.array([6, 255, 255])]  # Red1
+        filters_red2 = [np.array([170, 165, 140]), np.array([180, 255, 255])]  # Red2
+
         mask_go = cv2.inRange(image_hsv, filters_go[0], filters_go[1])
         contours_go = cv2.findContours(mask_go, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)[0]
 
+        mask_green = cv2.inRange(image_hsv, filters_green[0], filters_green[1])
+        mask_red1 = cv2.inRange(image_hsv, filters_red[0], filters_red[1])
+        mask_red2 = cv2.inRange(image_hsv, filters_red2[0], filters_red2[1])
+        mask_red = cv2.bitwise_or(mask_red1, mask_red2)
+
+        contours_red = cv2.findContours(mask_red, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)[0]
+        contours_green = cv2.findContours(mask_green, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)[0]
+
+        if(len(contours_red) == 0 and len(contours_green) == 0 or rospy.Time.now() - self.shortcut_time < rospy.Duration(1, 0)):
+            return None, None
+        self.shortcut_time = rospy.Time.now()
+
+        if(len(contours_red) == 0):
+            max_index = 0
+            for i in range(0, len(contours_green)):
+                if(cv2.contourArea(contours_green[i]) > cv2.contourArea(contours_green[max_index])):
+                    max_index = i
+            if(cv2.contourArea(contours_green[max_index]) > threshold):
+                return True, contours_green[max_index]
+            return None, None
+        if(len(contours_green) == 0):
+            max_index = 0
+            for i in range(0, len(contours_red)):
+                if(cv2.contourArea(contours_red[i]) > cv2.contourArea(contours_red[max_index])):
+                    max_index = i
+            if(cv2.contourArea(contours_red[max_index]) > threshold):
+                return False, contours_red[max_index]
+            return None, None
+
+        max_index_r = 0
+        for i in range(0, len(contours_red)):
+            if(cv2.contourArea(contours_red[i]) > cv2.contourArea(contours_red[max_index_r])):
+                max_index_r = i
+        max_index_g = 0
+        for i in range(0, len(contours_green)):
+            if(cv2.contourArea(contours_green[i]) > cv2.contourArea(contours_green[max_index_g])):
+                max_index_g = i
+
+         the_green = contours_green[max_index_g]
+         the_red = contours_red[max_index_r]
+
+        if(cv2.contourArea(the_green) > cv2.contourArea(the_red) and cv2.contourArea(the_green) > threshold):
+            return True, the_green
+        if(cv2.contourArea(the_green) < cv2.contourArea(the_red) and cv2.contourArea(the_red) > threshold):
+            return False, the_red
+
+        return None, None
+
+        """
         if(len(contours_go) == 0 or rospy.Time.now() - self.shortcut_time < rospy.Duration(1, 0)):
             return None, None
         self.shortcut_time = rospy.Time.now()
@@ -174,6 +227,7 @@ class Wallfollow:
             return True, the_one
         return False, the_once
         # Returns a True if it is big enough
+        """
 
     def color_search_old(self, image_cv):
         threshold = 7000
