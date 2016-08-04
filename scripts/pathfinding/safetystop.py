@@ -14,7 +14,7 @@ class safetystop:
 
 	rospy.init_node("safetystop")
 	rospy.Subscriber('scan', LaserScan, self.parsescan)
-	self.drivepub = rospy.Publisher('/vesc/ackermann_cmd_mux/input/safety', AckermannDriveStamped, queue_size=1)	
+	self.drivepub = rospy.Publisher('/vesc/ackermann_cmd_mux/input/safety', AckermannDriveStamped, queue_size=1)
 
     def drive(self, angle, speed):
 
@@ -26,8 +26,8 @@ class safetystop:
 
     def parsescan(self, scan):
 
-	if min(scan.ranges[360:700])<.2:
-	    self.drive(0,0)
+	if min(scan.ranges[360:700]) < 0.2:
+	    self.drive(-1, -1)
 	    print "stop"
 
 
