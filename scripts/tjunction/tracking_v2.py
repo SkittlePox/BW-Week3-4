@@ -92,8 +92,8 @@ class ColorTracker:
 
 
         if self.debugging:
-            cv2.drawContours(img, [c], -1, (255, 0, 0), 3) 
-            cv2.drawContours(img, [approx], -1, (0, 255, 0), 5) 
+            cv2.drawContours(img, [c], -1, (255, 0, 0), 3)
+            cv2.drawContours(img, [approx], -1, (0, 255, 0), 5)
 
             coord = (approx[0][0][0], approx[0][0][1])
             cv2.putText(img, "GREEN", coord, cv2.FONT_HERSHEY_PLAIN, 3, (255, 255, 255),  2)
@@ -115,13 +115,8 @@ class ColorTracker:
         image_cv = self.bridge.imgmsg_to_cv2(image_msg)
 
         self.detection(image_cv)
-        
+
         if self.debugging:
-            try:
-                self.pub_image.publish(\
-                        self.bridge.cv2_to_imgmsg(image_cv, "bgr8"))
-            except CvBridgeError as e:
-                print(e)
         self.thread_lock.release()
 
 
@@ -129,4 +124,3 @@ if __name__=="__main__":
     rospy.init_node('ColorTracker')
     e = ColorTracker(True)
     rospy.spin()
-
