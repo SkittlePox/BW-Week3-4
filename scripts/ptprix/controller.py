@@ -15,29 +15,14 @@ class Controller:
             '/vesc/ackermann_cmd_mux/input/navigation', AckermannDriveStamped,
             queue_size=1)
 
-        rospy.Subscriber('detect', Float32[3], self.addcharges)
-
         self.charge_laser_particle = 0.07
-        # self.charge_forward_boost = 50.0
-        self.boost_distance = 0.5  # const
+        self.boost_distance = 0.5
         self.speed_const = 2.0
         self.p_speed = 0.007
         self.p_steering = 1.5
 
-        self.colorheight = 30 # height in pixels of boundingrect for color sign required to trigger steering charge
-        self.sidechargecoeff = 100
-
-        # self.x_components = {"backCharge": 50.0}
         self.x_components = {"backCharge": 200.0}
         self.y_components = {}
-
-    def addcharges(selfself, msg):
-
-        if msg.data[2] != -1 and msg.data[1]>=colorheight: # the first if check is redundant
-            self.y_components["sidecharge"] = (msg.data[1]*2-1)*sidechargecoeff
-        else:
-            self.y_components["sidecharge"] = 0
-
 
     def scanReceived(self, msg):
         scan_rad_angles = ((msg.angle_increment *
@@ -51,7 +36,6 @@ class Controller:
         scan_y_components = (self.charge_laser_particle *
                              scan_y_unit_vectors) / msg.ranges
 
-        # TODO: no squaring
         total_x_component = np.sum(scan_x_components) + sum(
             self.x_components.values())
         print("x/sum", total_x_component, sum(self.x_components.values()))
