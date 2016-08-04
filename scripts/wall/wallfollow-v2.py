@@ -38,6 +38,7 @@ class Wallfollow:
         self.direction = -1  # 1 for right, -1 for left
         self.the_time = rospy.Time.now()
         self.joy_time = rospy.Time.now()
+        self.shortcut_time = rospy.Time.now()
 
     def drive_control(self, msg):
         if(self.run):
@@ -64,7 +65,7 @@ class Wallfollow:
 
             error = (d0 - crude_distance) * self.kpd * self.direction + angle * self.kpa * self.direction
             print(angle, error)
-            self.drive(error, 2)
+            self.drive(error, 3)
 
     def calculate_angle(self, b, f, A):
         # b is the back lidar value, f is the front, and A is the angle between the values
@@ -79,9 +80,11 @@ class Wallfollow:
         return angle
 
     def drive(self, angle, speed):
+        """
         if(speed != 0):
             print(speed)
             # Ramp speed
+        """
         drive_command = AckermannDriveStamped()
         drive_command.drive.speed = speed
         drive_command.drive.steering_angle = angle
@@ -108,32 +111,71 @@ class Wallfollow:
             return
 
         image_cv = self.bridge.imgmsg_to_cv2(image_msg)
-        the_one, color_scheme, display_text = self.color_search(image_cv)
 
+        """
+        the_one, color_scheme, display_text = self.color_search(image_cv)
         if(display_text == "red"):
             #self.direction = 1
             print("Try: Switching to right side")
         elif(display_text == "green"):
             #self.direction = -1
             print("Try: Switching to left side")
+        """
 
-        #if(the_one is not None):
-            #image_cv = self.paint_image(image_cv, the_one, color_scheme, display_text)
-        #self.pub_image.publish(self.bridge.cv2_to_imgmsg(image_cv, "bgr8"))
+        shortcut, the_one = self.color_search(image_cv)
+
+        if(shortcut is not None):
+            if(shortcut):
+                self.direction = -1
+                color = std_msgs.msg.ColorRGBA(0.0, 255.0, 0.0, 0.0)
+            elif(not shortcut):
+                self.direction = 1
+                color = std_msgs.msg.ColorRGBA(255.0, 0.0, 0.0, 0.0)
+
+        if(the_one is not None):
+            #image_cv = self.paint_image_text(image_cv, the_one, color_scheme, display_text)
+            image_cv = self.paint_image(image_cv, the_one, color)
+        self.pub_image.publish(self.bridge.cv2_to_imgmsg(image_cv, "bgr8"))
 
         self.thread_lock.release()
 
-    def paint_image(self, image_cv, the_one, color_scheme, display_text):
+    def paint_image_text(self, image_cv, the_one, color_scheme, display_text):
         cv2.drawContours(image_cv, [the_one], -1, (color_scheme.b, color_scheme.g, color_scheme.r))
         x, y, w, h = cv2.boundingRect(the_one)
         cv2.rectangle(image_cv, (x, y), (x + w, y + h), (color_scheme.b, color_scheme.g, color_scheme.r, 2))
         cv2.circle(image_cv, (x + w / 2, y + h / 2), 4, (255, 255, 255), -1)
         font = cv2.FONT_HERSHEY_SIMPLEX
         cv2.putText(image_cv, display_text, (x + w / 2, y + 3 * h / 4), font, 2, (255, 255, 255), 2)
-	return image_cv
+        return image_cv
 
+    def paint_image(self, image_cv, the_one, color):
+        cv2.drawContours(image_cv, [the_one], -1, (color.b, color.g, color.r))
+        return image_cv
 
     def color_search(self, image_cv):
+        threshold = 10000
+        image_hsv = cv2.cvtColor(image_cv, cv2.COLOR_BGR2HSV)
+
+        filters_go = [np.array([22, 60, 30]), np.array([88, 255, 150])]  # Yellow and Green
+        mask_go = cv2.inRange(image_hsv, filters_go[0], filters_go[1])
+        contours_go = cv2.findContours(mask_go, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)[0]
+
+        if(len(contours_go) == 0 or rospy.Time.now() - self.shortcut_time < rospy.Duration(1, 0)):
+            return None, None
+        self.shortcut_time = rospy.Time.now()
+
+        max_index = 0
+        for i in range(0, len(contours_go)):
+            if(cv2.contourArea(contours_go[i]) > cv2.contourArea(contours_go[max_index])):
+                max_index = i
+        the_one = contours_go[max_index]
+        area = cv2.contourArea(the_one)
+        if(area > threshold):
+            return True, the_one
+        return False, the_once
+        # Returns a True if it is big enough
+
+    def color_search_old(self, image_cv):
         threshold = 7000
         image_hsv = cv2.cvtColor(image_cv, cv2.COLOR_BGR2HSV)
 
