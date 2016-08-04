@@ -35,7 +35,7 @@ class Controller:
         coeff = 300
         print("ye")
         print(x, area, color)
-        if area > 800 and color != -1:
+        if area > 700 and color != -1:
             if color == 0:
                 self.y_components['leftCharge'] = -coeff
                 print("right")
