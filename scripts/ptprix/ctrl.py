@@ -5,6 +5,7 @@ import math
 import numpy as np
 
 from ackermann_msgs.msg import AckermannDriveStamped
+from nav_msgs.msg import *
 from sensor_msgs.msg import LaserScan
 from std_msgs.msg import Int32MultiArray
 
@@ -13,6 +14,7 @@ class Controller:
     def __init__(self):
         rospy.Subscriber('scan', LaserScan, self.scanReceived)
         rospy.Subscriber('detect', Int32MultiArray, self.detectReceived)
+        self.joystick = rospy.Subscriber("/vesc/joy", Joy, self.handle_joy)
         self.drivepub = rospy.Publisher(
             '/vesc/ackermann_cmd_mux/input/navigation', AckermannDriveStamped,
             queue_size=1)
@@ -23,12 +25,15 @@ class Controller:
         self.speed_const = 3.0
         self.p_speed = 0.02
         self.p_steering = 1.5
+        self.run = False
 
         self.last_y = 0
         self.Kd = 0.2
 
         self.x_components = {"backCharge": 200.0}
         self.y_components = {"leftCharge": 0.0}
+
+        self.joy_time = rospy.Time.now()
 
     def detectReceived(self, msg):
         x, area, color = msg.data
@@ -75,13 +80,20 @@ class Controller:
 
         self.last_y = total_y_component
         print(total_x_component)
-        self.drive(angle, speed)
+        if self.run:
+            self.drive(angle, speed)
 
     def drive(self, angle, speed):
         ackmsg = AckermannDriveStamped()
         ackmsg.drive.speed = speed
         ackmsg.drive.steering_angle = angle
         self.drivepub.publish(ackmsg)
+
+    def handle_joy(self, msg):
+        if(msg.buttons[3] == 1 and rospy.Time.now() - self.joy_time >= rospy.Duration(0.5, 0)):    # A button
+            self.run = not self.run
+            self.joy_time = rospy.Time.now()
+            print("Switching ctrl", self.run)
 
 if __name__ == '__main__':
     rospy.init_node('Controller')

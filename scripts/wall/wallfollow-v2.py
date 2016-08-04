@@ -96,6 +96,7 @@ class Wallfollow:
         if(msg.buttons[0] == 1 and rospy.Time.now() - self.joy_time >= rospy.Duration(0.5, 0)):    # A button
             self.run = not self.run
             self.joy_time = rospy.Time.now()
+            print("Switching ctrl", self.run)
         if(msg.buttons[2] == 1):    # X button
             self.direction = -1
         elif(msg.buttons[1] == 1):  # B button
