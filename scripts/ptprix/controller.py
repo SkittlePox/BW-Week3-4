@@ -19,7 +19,7 @@ class Controller:
         self.boost_distance = 0.5
         self.speed_const = 2.0
         self.p_speed = 0.007
-        self.p_steering = 1.5
+        self.p_steering = 1
 
         self.x_components = {"backCharge": 200.0}
         self.y_components = {}
