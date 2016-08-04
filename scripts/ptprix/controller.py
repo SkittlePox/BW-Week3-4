@@ -21,7 +21,10 @@ class Controller:
         self.boost_distance = 0.5
         self.speed_const = 3.0
         self.p_speed = 0.007
-        self.p_steering = 2
+        self.p_steering = 1.5
+
+        self.last_y = 0
+        self.Kd = -0.5
 
         self.x_components = {"backCharge": 200.0}
         self.y_components = {"leftCharge": 0.0}
@@ -55,12 +58,15 @@ class Controller:
         total_y_component = np.sum(scan_y_components) + sum(
             self.y_components.values())
 
-        angle = (self.p_steering * np.sign(total_x_component) * math.atan2(
-            total_y_component, total_x_component))
+        angle = ((self.p_steering * np.sign(total_x_component) * math.atan2(
+            total_y_component, total_x_component)) + (self.Kd * (
+                total_y_component - self.last_y)))
 
         # speed = (self.p_speed * np.sign(total_x_component) * math.sqrt(
         #    total_x_component**2 + total_y_component**2))
         speed = self.speed_const
+
+        self.last_y = total_y_component
 
         self.drive(angle, speed)
 
