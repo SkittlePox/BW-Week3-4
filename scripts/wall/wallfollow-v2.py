@@ -126,9 +126,11 @@ class Wallfollow:
 
         if(shortcut is not None):
             if(shortcut):
+                print("Left")
                 self.direction = -1
                 color = std_msgs.msg.ColorRGBA(0.0, 255.0, 0.0, 0.0)
             elif(not shortcut):
+                print("right")
                 self.direction = 1
                 color = std_msgs.msg.ColorRGBA(255.0, 0.0, 0.0, 0.0)
 
