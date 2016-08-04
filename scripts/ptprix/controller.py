@@ -6,12 +6,13 @@ import numpy as np
 
 from ackermann_msgs.msg import AckermannDriveStamped
 from sensor_msgs.msg import LaserScan
+from std_msgs.msg import Int32MultiArray
 
 
 class Controller:
     def __init__(self):
         rospy.Subscriber('scan', LaserScan, self.scanReceived)
-        rospy.Subscriber('detect', LaserScan, self.detectReceived)
+        rospy.Subscriber('detect', Int32MultiArray, self.detectReceived)
         self.drivepub = rospy.Publisher(
             '/vesc/ackermann_cmd_mux/input/navigation', AckermannDriveStamped,
             queue_size=1)
