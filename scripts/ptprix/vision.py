@@ -27,9 +27,9 @@ class Vision:
     def processImage(self, image_msg):
         if not self.thread_lock.acquire(False):
             return
-        ms = self.findPoly(image_msg, 1)
+        ms = self.findPoly(image_msg, 0)
         if(ms is None):
-            ms = self.findPoly(image_msg, 0)
+            ms = self.findPoly(image_msg, 1)
         if(ms is None):
             ms = self.getDefaultMsg()
         print(ms.data)
