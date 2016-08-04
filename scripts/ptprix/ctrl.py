@@ -45,7 +45,7 @@ class Controller:
                 self.y_components['leftCharge'] = -coeff
                 print("right")
             elif color == 1:
-                self.y_components['leftCharge'] = coeff
+                self.y_components['leftCharge'] = coeff-100
                 print("strsaight")
         else:
             print("non")
