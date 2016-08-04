@@ -24,7 +24,7 @@ class Controller:
         self.p_steering = 1.5
 
         self.last_y = 0
-        self.Kd = 0.5
+        self.Kd = 0.2
 
         self.x_components = {"backCharge": 200.0}
         self.y_components = {"leftCharge": 0.0}
