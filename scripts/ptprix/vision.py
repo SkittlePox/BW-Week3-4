@@ -27,9 +27,9 @@ class Vision:
     def processImage(self, image_msg):
         if not self.thread_lock.acquire(False):
             return
-        ms = self.findPoly(image_msg, 1)
+        ms = self.findPoly(image_msg, 0)
         if(ms is None):
-            ms = self.findPoly(image_msg, 0)
+            ms = self.findPoly(image_msg, 1)
         if(ms is None):
             ms = self.getDefaultMsg()
         print(ms.data)
@@ -48,8 +48,8 @@ class Vision:
             greens = [np.array([54, 110, 10]), np.array([72, 180, 200])]
             mask = cv2.inRange(hsv, greens[0], greens[1])
         else:
-            filters_red = [np.array([0, 165, 70]), np.array([8, 255, 255])]
-            filters_red2 = [np.array([170, 165, 140]),
+            filters_red = [np.array([0, 125, 70]), np.array([8, 255, 255])]
+            filters_red2 = [np.array([170, 125, 70]),
                             np.array([180, 255, 255])]
             mask_red = cv2.inRange(hsv, filters_red[0], filters_red[1])
             mask_red2 = cv2.inRange(hsv, filters_red2[0],
