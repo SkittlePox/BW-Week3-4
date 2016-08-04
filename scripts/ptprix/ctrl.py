@@ -21,7 +21,7 @@ class Controller:
 
         self.boost_distance = 0.5
         self.speed_const = 3.0
-        self.p_speed = 0.5
+        self.p_speed = 0.02
         self.p_steering = 1.5
 
         self.last_y = 0
@@ -35,7 +35,7 @@ class Controller:
         coeff = 300
         print("ye")
         print(x, area, color)
-        if area > 450 and color != -1:
+        if area > 800 and color != -1:
             if color == 0:
                 self.y_components['leftCharge'] = -coeff
                 print("right")
@@ -74,7 +74,7 @@ class Controller:
         speed = self.p_speed*total_x_component
 
         self.last_y = total_y_component
-
+        print(total_x_component)
         self.drive(angle, speed)
 
     def drive(self, angle, speed):
