@@ -51,8 +51,8 @@ class Vision:
             filters_red = [np.array([0, 165, 70]), np.array([6, 255, 255])]
             filters_red2 = [np.array([170, 165, 140]),
                             np.array([180, 255, 255])]
-            mask_red = cv2.inRange(image_hsv, filters_red[0], filters_red[1])
-            mask_red2 = cv2.inRange(image_hsv, filters_red2[0],
+            mask_red = cv2.inRange(hsv, filters_red[0], filters_red[1])
+            mask_red2 = cv2.inRange(hsv, filters_red2[0],
                                     filters_red2[1])
             mask = cv2.bitwise_or(mask_red, mask_red2)
 
