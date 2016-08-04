@@ -21,7 +21,7 @@ class Controller:
 
         self.boost_distance = 0.5
         self.speed_const = 3.0
-        self.p_speed = 0.007
+        self.p_speed = 0.5
         self.p_steering = 1.5
 
         self.last_y = 0
@@ -70,7 +70,8 @@ class Controller:
 
         # speed = (self.p_speed * np.sign(total_x_component) * math.sqrt(
         #    total_x_component**2 + total_y_component**2))
-        speed = self.speed_const
+        # speed = self.speed_const
+        speed = self.p_speed*total_x_component
 
         self.last_y = total_y_component
 
