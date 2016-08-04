@@ -39,11 +39,12 @@ class Wallfollow:
         self.the_time = rospy.Time.now()
         self.joy_time = rospy.Time.now()
         self.shortcut_time = rospy.Time.now()
+        self.dirstop = rospy.Time.now()
 
     def drive_control(self, msg):
         if(self.run):
             d0 = 0.6   # Optimal distance from wall
-            a = 90      # Distance between collection points
+            a = 80      # Distance between collection points
             tolerance = 1   # Span to anerage distances on either side
             midpoints = [900, 180]
             crude_ranges = [[800, 1000], [80, 280]]
@@ -155,7 +156,7 @@ class Wallfollow:
         return image_cv
 
     def color_search(self, image_cv):
-        threshold = 1000
+        threshold = 500
         image_hsv = cv2.cvtColor(image_cv, cv2.COLOR_BGR2HSV)
 
         filters_go = [np.array([22, 60, 30]), np.array([88, 255, 150])]  # Yellow and Green
@@ -174,7 +175,7 @@ class Wallfollow:
         contours_red = cv2.findContours(mask_red, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)[0]
         contours_green = cv2.findContours(mask_green, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)[0]
 
-        if(len(contours_red) == 0 and len(contours_green) == 0 or rospy.Time.now() - self.shortcut_time < rospy.Duration(1, 0)):
+        if(len(contours_red) == 0 and len(contours_green) == 0 or rospy.Time.now() - self.shortcut_time < rospy.Duration(1, 0) or rospy.Time.now() - self.dirstop < rospy.Duration(10, 0)):
             return None, None
         self.shortcut_time = rospy.Time.now()
 
