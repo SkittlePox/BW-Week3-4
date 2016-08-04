@@ -49,7 +49,7 @@ class Vision:
             mask = cv2.inRange(hsv, greens[0], greens[1])
         else:
             filters_red = [np.array([0, 145, 70]), np.array([15, 255, 255])]
-            filters_red2 = [np.array([170, 145, 70]),
+            filters_red2 = [np.array([170, 145, 140]),
                             np.array([180, 255, 255])]
             mask_red = cv2.inRange(hsv, filters_red[0], filters_red[1])
             mask_red2 = cv2.inRange(hsv, filters_red2[0],
