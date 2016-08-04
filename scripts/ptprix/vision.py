@@ -16,6 +16,7 @@ class Vision:
             '/camera/rgb/image_rect_color', Image, self.cbImage, queue_size=1)
         self.pub = rospy.Publisher('/detect', Int32MultiArray, queue_size=1)
 
+        self.pub_image = rospy.Publisher("~echo_image", Image, queue_size=1)
         self.bridge = CvBridge()
 
     def cbImage(self, msg):
@@ -63,6 +64,12 @@ class Vision:
 
         msg = Int32MultiArray()
         msg.data = [x, area, color]  # area or height?
+        try:
+            self.pub_image.publish(
+                self.bridge.cv2_to_imgmsg(img, "bgr8"))
+        except CvBridgeError as e:
+            print(e)
+
         return msg
 
 if __name__=="__main__":
