@@ -3,6 +3,5 @@
     <include file="$(find zed_wrapper)/launch/zed.launch"/>
     <node name = "safetystop" pkg ="racecar_66" type = "safetystop.py"/>
     <node name = "Vision" pkg ="racecar_66" type = "vision.py"/>
-    <node name = "Vision" pkg ="racecar_66" type = "wallfollower-v2.py"/>
     <node name = "Control" pkg ="racecar_66" type = "ctrl.py"/>
 </launch>

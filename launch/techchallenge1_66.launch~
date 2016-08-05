@@ -1,3 +1,0 @@
-<launch>
-    <node pkg = "come_on_and_SLAM" name = "slam" type ="scripts/pathfinding/fieldexplore.py">
-</launch>

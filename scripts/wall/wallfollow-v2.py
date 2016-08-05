@@ -35,14 +35,17 @@ class Wallfollow:
         self.kpa = 1 / 150.0   # For angle
 
         self.run = False
-        self.direction = -1  # 1 for right, -1 for left
+        self.direction = None  # 1 for right, -1 for left
+        self.image_processing = False
+
         self.the_time = rospy.Time.now()
-        self.joy_time = rospy.Time.now()
+        self.joy_time_drive = rospy.Time.now()
+        self.joy_time_image = rospy.Time.now()
         self.shortcut_time = rospy.Time.now()
         self.dirstop = rospy.Time.now()
 
     def drive_control(self, msg):
-        if(self.run):
+        if(self.run and self.direction is not None):
             d0 = 0.6   # Optimal distance from wall
             a = 80      # Distance between collection points
             tolerance = 1   # Span to anerage distances on either side
@@ -81,11 +84,6 @@ class Wallfollow:
         return angle
 
     def drive(self, angle, speed):
-        """
-        if(speed != 0):
-            print(speed)
-            # Ramp speed
-        """
         drive_command = AckermannDriveStamped()
         drive_command.drive.speed = speed
         drive_command.drive.steering_angle = angle
@@ -93,14 +91,17 @@ class Wallfollow:
         self.drive_pub.publish(drive_command)
 
     def handle_joy(self, msg):
-        if(msg.buttons[0] == 1 and rospy.Time.now() - self.joy_time >= rospy.Duration(0.5, 0)):    # A button
+        if(msg.buttons[0] == 1 and rospy.Time.now() - self.joy_time_drive >= rospy.Duration(0.5, 0)):    # A button
             self.run = not self.run
-            self.joy_time = rospy.Time.now()
+            self.joy_time_drive = rospy.Time.now()
             print("Switching ctrl", self.run)
         if(msg.buttons[2] == 1):    # X button
             self.direction = -1
         elif(msg.buttons[1] == 1):  # B button
             self.direction = 1
+        if(msg.button[3] == 1) and rospy.Time.now() - self.joy_time_image >= rospy.Duration(0.5, 0):     # Y button
+            self.image_processing = not self.image_processing
+            self.joy_time_image = rospy.Time.now()
 
     def thread_image(self, msg):
         thread = threading.Thread(target=self.process_image, args=(msg,))
@@ -114,19 +115,9 @@ class Wallfollow:
 
         image_cv = self.bridge.imgmsg_to_cv2(image_msg)
 
-        """
-        the_one, color_scheme, display_text = self.color_search(image_cv)
-        if(display_text == "red"):
-            #self.direction = 1
-            print("Try: Switching to right side")
-        elif(display_text == "green"):
-            #self.direction = -1
-            print("Try: Switching to left side")
-        """
-
         shortcut, the_one = self.color_search(image_cv)
 
-        if(shortcut is not None):
+        if(shortcut is not None and self.image_processing):
             if(shortcut):
                 print("Left")
                 self.direction = -1
@@ -160,13 +151,9 @@ class Wallfollow:
         threshold = 500
         image_hsv = cv2.cvtColor(image_cv, cv2.COLOR_BGR2HSV)
 
-        filters_go = [np.array([22, 60, 30]), np.array([88, 255, 150])]  # Yellow and Green
         filters_green = [np.array([54, 110, 10]), np.array([72, 180, 200])] # Green
-        filters_red = [np.array([0, 165, 70]), np.array([8, 255, 255])]  # Red1
-        filters_red2 = [np.array([170, 165, 140]), np.array([180, 255, 255])]  # Red2
-
-        mask_go = cv2.inRange(image_hsv, filters_go[0], filters_go[1])
-        contours_go = cv2.findContours(mask_go, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)[0]
+        filters_red = [np.array([0, 125, 70]), np.array([8, 255, 255])]  # Red1
+        filters_red2 = [np.array([170, 100, 70]), np.array([180, 255, 255])]  # Red2
 
         mask_green = cv2.inRange(image_hsv, filters_green[0], filters_green[1])
         mask_red1 = cv2.inRange(image_hsv, filters_red[0], filters_red[1])
@@ -215,102 +202,6 @@ class Wallfollow:
             return False, the_red
 
         return None, None
-
-        """
-        if(len(contours_go) == 0 or rospy.Time.now() - self.shortcut_time < rospy.Duration(1, 0)):
-            return None, None
-        self.shortcut_time = rospy.Time.now()
-
-        max_index = 0
-        for i in range(0, len(contours_go)):
-            if(cv2.contourArea(contours_go[i]) > cv2.contourArea(contours_go[max_index])):
-                max_index = i
-        the_one = contours_go[max_index]
-        area = cv2.contourArea(the_one)
-        if(area > threshold):
-            return True, the_one
-        return False, the_once
-        # Returns a True if it is big enough
-        """
-
-    def color_search_old(self, image_cv):
-        threshold = 7000
-        image_hsv = cv2.cvtColor(image_cv, cv2.COLOR_BGR2HSV)
-
-        filters_red = [np.array([0, 165, 70]), np.array([6, 255, 255])]  # Red
-        filters_red2 = [np.array([170, 165, 140]), np.array([180, 255, 255])]  # Red
-        filters_green = [np.array([50, 100, 30]), np.array([88, 255, 255])]  # Green
-        filters_yellow = [np.array([22, 150, 84]), np.array([40, 255, 190])]  # Yellow
-        filters_blue = [np.array([106, 127, 40]), np.array([127, 235, 215])]  # Blue
-        filters_pink = [np.array([144, 91, 116]), np.array([165, 145, 255])]  # Pink
-
-        mask_red = cv2.inRange(image_hsv, filters_red[0], filters_red[1])
-        mask_red2 = cv2.inRange(image_hsv, filters_red2[0], filters_red2[1])
-        mask_green = cv2.inRange(image_hsv, filters_green[0], filters_green[1])
-        mask_yellow = cv2.inRange(image_hsv, filters_yellow[0], filters_yellow[1])
-        mask_blue = cv2.inRange(image_hsv, filters_blue[0], filters_blue[1])
-        mask_pink = cv2.inRange(image_hsv, filters_pink[0], filters_pink[1])
-
-        # Bridging two red filters
-        mask_red = cv2.bitwise_or(mask_red, mask_red2)
-
-        mask_red = cv2.GaussianBlur(mask_red, (3, 3), 0)
-        mask_green = cv2.GaussianBlur(mask_green, (3, 3), 0)
-        mask_yellow = cv2.GaussianBlur(mask_yellow, (3, 3), 0)
-        mask_blue = cv2.GaussianBlur(mask_blue, (3, 3), 0)
-        mask_pink = cv2.GaussianBlur(mask_pink, (3, 3), 0)
-
-        contours_red = cv2.findContours(mask_red, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)[0]
-        contours_green = cv2.findContours(mask_green, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)[0]
-        contours_yellow = cv2.findContours(mask_yellow, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)[0]
-        contours_blue = cv2.findContours(mask_blue, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)[0]
-        contours_pink = cv2.findContours(mask_pink, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)[0]
-
-        test_red = len(contours_red) > 0
-        test_green = len(contours_green) > 0
-        test_yellow = len(contours_yellow) > 0
-        test_blue = len(contours_blue) > 0
-        test_pink = len(contours_pink) > 0
-
-        if not (test_red or test_green or test_yellow or test_blue or test_pink):  # TODO implement clock check with time.clock() - 5 > the_time, omitted for debugging purposes
-            return
-
-        contours = [contours_red, contours_green, contours_yellow, contours_blue, contours_pink]
-        tests = [test_red, test_green, test_yellow, test_blue, test_pink]
-        colors = ["red", "green", "yellow", "blue", "pink"]
-        color_objects = [std_msgs.msg.ColorRGBA(255.0, 0.0, 0.0, 0.0), std_msgs.msg.ColorRGBA(0.0, 255.0, 0.0, 0.0), std_msgs.msg.ColorRGBA(255.0, 255.0, 0.0, 0.0), std_msgs.msg.ColorRGBA(0.0, 0.0, 255.0, 0.0), std_msgs.msg.ColorRGBA(255.0, 0.0, 255.0, 0.0)]
-
-        # Populated Later
-        largest_areas = []
-        largest_contours = []
-
-        # Winning contour specific variables
-        the_one = None  # The winning contour
-        display_text = ""
-        color_scheme = None  # What color box to draw around it
-
-        for i in range(0, len(tests)):
-            if(tests[i]):   # If any contours were found of the 'i'th color
-                max_contour = contours[i][0]
-                for j in range(0, len(contours[i])):
-                    if(cv2.contourArea(contours[i][j]) > cv2.contourArea(max_contour)):
-                        max_contour = contours[i][j]
-                largest_areas.append(cv2.contourArea(max_contour))  # Place the largest found contour's area in the largest_areas array
-                largest_contours.append(max_contour)                # Place the contour itself in the largest_contours array
-            else:   # If no contours exist for a given mask populated it with empty values
-                largest_areas.append(0)
-                largest_contours.append(np.array([[0, 0]]))
-
-        largest = max(largest_areas)
-        for i in range(0, len(largest_areas)):  # Finds the winning contour
-            if(largest_areas[i] == largest):    # This is the winning contour TODO implement threshold for size!
-                the_one = largest_contours[i]
-                display_text = colors[i]
-                color_scheme = color_objects[i]
-        if (largest < threshold):
-            return None, None, None
-
-        return the_one, color_scheme, display_text
 
 if __name__ == "__main__":
     rospy.init_node('Wallfollow')
