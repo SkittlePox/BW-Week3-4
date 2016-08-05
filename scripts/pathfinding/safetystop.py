@@ -25,10 +25,9 @@ class safetystop:
         self.drivepub.publish(ackmsg)
 
     def parsescan(self, scan):
-
-	if min(scan.ranges[360:700]) < 0.35:
-	    self.drive(-2, -1)
-	    print "stop"
+        if min(scan.ranges[360:700]) < 0.35:
+            self.drive(-2, -1)
+            print "stop"
 
 
 if __name__ == '__main__':
