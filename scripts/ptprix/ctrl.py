@@ -14,7 +14,6 @@ class Controller:
     def __init__(self):
         rospy.Subscriber('scan', LaserScan, self.scanReceived)
         rospy.Subscriber('detect', Int32MultiArray, self.detectReceived)
-        self.joystick = rospy.Subscriber("/vesc/joy", Joy, self.handle_joy)
         self.drivepub = rospy.Publisher(
             '/vesc/ackermann_cmd_mux/input/navigation', AckermannDriveStamped,
             queue_size=1)
@@ -25,7 +24,7 @@ class Controller:
         self.speed_const = 3.0
         self.p_speed = 0.02
         self.p_steering = 1.5
-        self.run = False
+        self.run = True
 
         self.last_y = 0
         self.Kd = 0.2

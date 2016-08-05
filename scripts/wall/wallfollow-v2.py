@@ -46,7 +46,7 @@ class Wallfollow:
 
     def drive_control(self, msg):
         if(self.run and self.direction is not None):
-            d0 = 0.6   # Optimal distance from wall
+            d0 = 0.7   # Optimal distance from wall
             a = 80      # Distance between collection points
             tolerance = 1   # Span to anerage distances on either side
             midpoints = [900, 180]
@@ -99,7 +99,7 @@ class Wallfollow:
             self.direction = -1
         elif(msg.buttons[1] == 1):  # B button
             self.direction = 1
-        if(msg.button[3] == 1) and rospy.Time.now() - self.joy_time_image >= rospy.Duration(0.5, 0):     # Y button
+        if(msg.buttons[3] == 1) and rospy.Time.now() - self.joy_time_image >= rospy.Duration(0.5, 0):     # Y button
             self.image_processing = not self.image_processing
             self.joy_time_image = rospy.Time.now()
 
@@ -127,9 +127,9 @@ class Wallfollow:
                 self.direction = 1
                 color = std_msgs.msg.ColorRGBA(255.0, 0.0, 0.0, 0.0)
 
-        if(the_one is not None):
+        #if(the_one is not None):
             #image_cv = self.paint_image_text(image_cv, the_one, color_scheme, display_text)
-            image_cv = self.paint_image(image_cv, the_one, color)
+            #image_cv = self.paint_image(image_cv, the_one)
         self.pub_image.publish(self.bridge.cv2_to_imgmsg(image_cv, "bgr8"))
 
         self.thread_lock.release()
